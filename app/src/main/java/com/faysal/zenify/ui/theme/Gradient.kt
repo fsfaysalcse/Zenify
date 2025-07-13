@@ -11,7 +11,7 @@ val MusicGradient = Brush.verticalGradient(
     )
 )
 
-val MusicPrimaryColor = Color(0xFFFF0033) // Neon red, like Blinding Lights tone
+val MusicPrimaryColor = Color(0xFF5C0029) // Neon red, like Blinding Lights tone
 val MusicSecondaryColor = Color(0xFF9B0000) // Dark red/maroon
 
 val TrackGradient = Brush.radialGradient(

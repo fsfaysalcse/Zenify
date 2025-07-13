@@ -1,5 +1,10 @@
 package com.faysal.zenify.ui.screen
 
+import android.util.Log
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -11,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -22,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -31,6 +38,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -39,10 +48,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.faysal.zenify.R
+import com.faysal.zenify.ui.model.BlindingLights
 import com.faysal.zenify.ui.theme.AvenirNext
 import com.faysal.zenify.ui.theme.MusicGradient
+import com.faysal.zenify.ui.theme.MusicSecondaryColor
 import com.faysal.zenify.ui.widgets.GestureMusicButton
-import com.faysal.zenify.ui.widgets.GradientVolumeIndicator
+import com.faysal.zenify.ui.widgets.LyricsCaption
+import com.faysal.zenify.ui.widgets.LyricsHeaderBar
 import com.faysal.zenify.ui.widgets.ZenWaveSeekBar
 
 data class Song(
@@ -61,11 +73,13 @@ fun PlayerScreen(modifier: Modifier = Modifier) {
     var progress by remember { mutableFloatStateOf(0.3f) }
 
     val songs = listOf(
-        Song("Blinding Lights(Remix)", "The Weekend", "3:45"),
+        Song("Blinding Lights", "The Weekend", "3:45"),
         Song("Digital Rain", "Neon Pulse", "4:12"),
         Song("Cosmic Waves", "Stellar Drift", "5:03"),
         Song("Urban Lights", "City Glow", "3:28")
     )
+
+    var currentTime by remember { mutableLongStateOf(33000) }
 
 
     Box(
@@ -175,7 +189,7 @@ fun PlayerScreen(modifier: Modifier = Modifier) {
                         modifier = Modifier
                             .padding(top = 40.dp)
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 10.dp),
+                            .padding(horizontal = 16.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -248,8 +262,6 @@ fun PlayerScreen(modifier: Modifier = Modifier) {
                     }
 
 
-                    Spacer(modifier = Modifier.height(15.dp))
-
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -313,24 +325,73 @@ fun PlayerScreen(modifier: Modifier = Modifier) {
 
         // Lyric View
 
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .align(Alignment.BottomCenter)
-                .background(
-                    color = Color.White.copy(alpha = 0.5f),
-                    shape = RoundedCornerShape(
-                        topStart = 9.dp,
-                        topEnd = 9.dp
+        var isFullScreen by remember { mutableStateOf(false) }
+
+        val configuration = LocalConfiguration.current
+
+
+        val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+
+        val animateLyricsHeight by animateDpAsState(
+            targetValue = if (isFullScreen) screenHeight else 100.dp,
+            animationSpec = tween(durationMillis = 300),
+            label = "lyrics_height_animation"
+        )
+
+        val animateLyricsOffsetY by animateDpAsState(
+            targetValue = if (isFullScreen) 0.dp else screenHeight - 100.dp,
+            animationSpec = tween(durationMillis = 300),
+            label = "lyrics_offset_animation"
+        )
+
+        val animateLyricsPadding by animateDpAsState(
+            targetValue = if (isFullScreen) 0.dp else 16.dp,
+            animationSpec = tween(durationMillis = 300),
+            label = "lyrics_padding_animation"
+        )
+
+        val lyricsBackgroundColor by animateColorAsState(
+            targetValue = if (isFullScreen) {
+                MusicSecondaryColor.copy(alpha = 1f)
+            } else {
+                MusicSecondaryColor.copy(alpha = 0.5f)
+            }
+        )
+
+
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(animateLyricsHeight)
+                    .padding(horizontal = animateLyricsPadding)
+                    .offset(y = animateLyricsOffsetY)
+                    .background(
+                        color = MusicSecondaryColor,
+                        shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
                     )
+                    .padding(16.dp)
+                    .align(Alignment.TopCenter)
+            ) {
+
+                LyricsHeaderBar(
+                    onShareClick = {
+                        Log.d("LyricsHeader", "Share clicked")
+                    },
+                    onFullScreenClick = {
+                        isFullScreen = !isFullScreen
+                        Log.d("LyricsHeader", "FullScreen toggled: $isFullScreen")
+                    }
                 )
-                .padding(all = 16.dp)
-        ) {
 
+                LyricsCaption(
+                    song = BlindingLights,
+                    currentTimeMs = currentTime,
+                    isPlaying = isPlaying,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
         }
-
-
     }
 }
 
