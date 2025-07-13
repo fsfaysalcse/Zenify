@@ -1,6 +1,5 @@
 package com.faysal.zenify.ui.screen
 
-import android.widget.ImageButton
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -11,9 +10,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -39,9 +41,8 @@ import androidx.compose.ui.unit.sp
 import com.faysal.zenify.R
 import com.faysal.zenify.ui.theme.AvenirNext
 import com.faysal.zenify.ui.theme.MusicGradient
-import com.faysal.zenify.ui.theme.Nunito
-import com.faysal.zenify.ui.theme.ProductSans
 import com.faysal.zenify.ui.widgets.GestureMusicButton
+import com.faysal.zenify.ui.widgets.GradientVolumeIndicator
 import com.faysal.zenify.ui.widgets.ZenWaveSeekBar
 
 data class Song(
@@ -67,171 +68,269 @@ fun PlayerScreen(modifier: Modifier = Modifier) {
     )
 
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                brush = MusicGradient
-            ),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+            .background(brush = MusicGradient)
+            .statusBarsPadding()
+            .navigationBarsPadding(),
     ) {
-        // Player Container
-        Box(
+
+        //Toolbar
+        Row(
             modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    color = Color.Black.copy(alpha = 0.3f)
-                )
+                .fillMaxWidth()
                 .padding(16.dp),
-            contentAlignment = Alignment.Center
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Column(
-                modifier = Modifier,
-                horizontalAlignment = Alignment.CenterHorizontally
+            // Back Button
+            IconButton(
+                onClick = { /* Handle back navigation */ },
+                modifier = Modifier.size(40.dp)
             ) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_arrow_down),
+                    contentDescription = "Back",
+                    modifier = Modifier.size(27.dp),
+                    colorFilter = ColorFilter.tint(Color.White)
+                )
+            }
 
-                Box(
-                    modifier = Modifier.size(300.dp),
-                    contentAlignment = Alignment.Center
-                ) {
+            // Title
+            Text(
+                text = "Playing Recommended Tracks",
+                color = Color.White,
+                fontSize = 14.sp,
+                fontFamily = AvenirNext,
+                fontWeight = FontWeight.Medium
+            )
 
-                    Image(
-                        painter = painterResource(id = com.faysal.zenify.R.drawable.music_cover),
-                        contentDescription = "Music Note",
-                        modifier = Modifier
-                            .size(220.dp)
-                            .clip(CircleShape)
-                            .shadow(
-                                elevation = 20.dp,
-                                shape = CircleShape,
-                                ambientColor = Color(0xFFFFFFFF),
-                                spotColor = Color(0xFF000000)
-                            )
-                    )
-
-                    GestureMusicButton(
-                        isPlaying = isPlaying,
-                        onPlayPause = { isPlaying = it },
-                        onLongPress = { /* Handle long press */ },
-                        onSwipe = { direction -> println("Swiped: $direction") },
-                        onHold = { direction -> println("Held: $direction") }
-                    )
-                }
-
-
-                // Song Title and Artist
-
-                Row (
-                    modifier = Modifier
-                        .padding(top = 40.dp)
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 10.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ){
-
-                    Column(
-                        modifier = Modifier.weight(0.8f),
-                        horizontalAlignment = Alignment.Start,
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-
-                        Text(
-                            text = songs[currentSong].title,
-                            color = Color.White,
-                            fontSize = 22.sp,
-                            fontFamily = AvenirNext,
-                            lineHeight = 28.sp,
-                            fontWeight = FontWeight.Medium,
-                            textAlign = TextAlign.Start,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                        )
-                        Text(
-                            text = songs[currentSong].artist,
-                            color = Color.White.copy(alpha = 0.7f),
-                            fontSize = 16.sp,
-                            fontFamily = AvenirNext,
-                            textAlign = TextAlign.Start,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-
-                    //Bookmark Icon
-                    IconButton(
-                        onClick = { /* Handle bookmark click */ },
-                        modifier = Modifier.weight(0.2f)
-                            .size(40.dp)
-                            .clip(CircleShape)
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.ic_bookmark),
-                            contentDescription = "Bookmark",
-                            modifier = Modifier.size(24.dp),
-                            colorFilter = ColorFilter.tint(Color.White)
-                        )
-                    }
-
-                }
-
-
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 15.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    ZenWaveSeekBar(
-                        modifier = Modifier.fillMaxWidth(),
-                        progress = progress,
-                        onProgressChange = { progress = it },
-                        activeWaveColor = Color(0xFFFFFFFF),
-                        inactiveWaveColor = Color.White.copy(alpha = 0.1f),
-                        durationMs = 210000L,
-                        barWidth = 5.dp,
-                        barSpacing = 2.dp,
-                        maxBarHeight = 20.dp
-                    )
-                }
-
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                // Instructions
-                /*  Column(
-                      horizontalAlignment = Alignment.CenterHorizontally,
-                      verticalArrangement = Arrangement.spacedBy(4.dp)
-                  ) {
-                      Text(
-                          "• Tap center: Play/Pause",
-                          color = Color.White.copy(alpha = 0.5f),
-                          fontFamily = Nunito,
-                          fontSize = 12.sp
-                      )
-                      Text(
-                          "• Drag center left/right: Previous/Next",
-                          color = Color.White.copy(alpha = 0.5f),
-                          fontFamily = Nunito,
-                          fontSize = 12.sp
-                      )
-                      Text(
-                          "• Drag center up/down: Volume",
-                          color = Color.White.copy(alpha = 0.5f),
-                          fontFamily = Nunito,
-                          fontSize = 12.sp
-                      )
-                      Text(
-                          "• Drag knob around circle: Scrub",
-                          color = Color.White.copy(alpha = 0.5f),
-                          fontFamily = Nunito,
-                          fontSize = 12.sp
-                      )
-                  }*/
+            // More Options Button
+            IconButton(
+                onClick = { /* Handle more options */ },
+                modifier = Modifier.size(40.dp)
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_more),
+                    contentDescription = "More Options",
+                    modifier = Modifier.size(24.dp),
+                    colorFilter = ColorFilter.tint(Color.White)
+                )
             }
         }
+
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            // Player Container
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        color = Color.Black.copy(alpha = 0.3f)
+                    )
+                    .padding(16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    modifier = Modifier,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+
+                    Box(
+                        modifier = Modifier.size(300.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+
+                        Image(
+                            painter = painterResource(id = com.faysal.zenify.R.drawable.music_cover),
+                            contentDescription = "Music Note",
+                            modifier = Modifier
+                                .size(220.dp)
+                                .clip(CircleShape)
+                                .shadow(
+                                    elevation = 20.dp,
+                                    shape = CircleShape,
+                                    ambientColor = Color(0xFFFFFFFF),
+                                    spotColor = Color(0xFF000000)
+                                )
+                        )
+
+                        GestureMusicButton(
+                            isPlaying = isPlaying,
+                            onPlayPause = { isPlaying = it },
+                            onLongPress = { /* Handle long press */ },
+                            onSwipe = { direction -> println("Swiped: $direction") },
+                            onHold = { direction -> println("Held: $direction") }
+                        )
+                    }
+
+
+                    // Song Title and Artist
+
+                    Row(
+                        modifier = Modifier
+                            .padding(top = 40.dp)
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 10.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+
+                        Column(
+                            modifier = Modifier.weight(0.8f),
+                            horizontalAlignment = Alignment.Start,
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+
+                            Text(
+                                text = songs[currentSong].title,
+                                color = Color.White,
+                                fontSize = 22.sp,
+                                fontFamily = AvenirNext,
+                                lineHeight = 28.sp,
+                                fontWeight = FontWeight.Medium,
+                                textAlign = TextAlign.Start,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                            )
+                            Text(
+                                text = songs[currentSong].artist,
+                                color = Color.White.copy(alpha = 0.7f),
+                                fontSize = 16.sp,
+                                fontFamily = AvenirNext,
+                                textAlign = TextAlign.Start,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+
+                        //Bookmark Icon
+                        IconButton(
+                            onClick = { /* Handle bookmark click */ },
+                            modifier = Modifier
+                                .weight(0.2f)
+                                .size(40.dp)
+                                .clip(CircleShape)
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.ic_bookmark),
+                                contentDescription = "Bookmark",
+                                modifier = Modifier.size(27.dp),
+                                colorFilter = ColorFilter.tint(Color.White)
+                            )
+                        }
+
+                    }
+
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 15.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        ZenWaveSeekBar(
+                            modifier = Modifier.fillMaxWidth(),
+                            progress = progress,
+                            onProgressChange = { progress = it },
+                            activeWaveColor = Color(0xFFFFFFFF),
+                            inactiveWaveColor = Color.White.copy(alpha = 0.1f),
+                            durationMs = 210000L,
+                            barWidth = 5.dp,
+                            barSpacing = 2.dp,
+                            maxBarHeight = 20.dp
+                        )
+                    }
+
+
+                    Spacer(modifier = Modifier.height(15.dp))
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+
+                        // Shuffle Button
+                        IconButton(
+                            onClick = { /* Handle shuffle */ },
+                            modifier = Modifier.size(48.dp)
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.ic_shuffle),
+                                contentDescription = "Shuffle",
+                                colorFilter = ColorFilter.tint(Color.White)
+                            )
+                        }
+
+                        // Repeat Button
+                        IconButton(
+                            onClick = { /* Handle repeat */ },
+                            modifier = Modifier.size(48.dp)
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.ic_repeat),
+                                contentDescription = "Repeat",
+                                colorFilter = ColorFilter.tint(Color.White)
+                            )
+                        }
+
+                        // Share Button
+                        IconButton(
+                            onClick = { /* Handle share */ },
+                            modifier = Modifier.size(48.dp)
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.ic_share),
+                                contentDescription = "Share",
+                                colorFilter = ColorFilter.tint(Color.White)
+                            )
+                        }
+
+                        //Queue Button
+                        IconButton(
+                            onClick = { /* Handle queue */ },
+                            modifier = Modifier.size(48.dp)
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.ic_queue),
+                                contentDescription = "Queue",
+                                colorFilter = ColorFilter.tint(Color.White)
+                            )
+                        }
+                    }
+
+                }
+            }
+        }
+
+        // Lyric View
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .align(Alignment.BottomCenter)
+                .background(
+                    color = Color.White.copy(alpha = 0.5f),
+                    shape = RoundedCornerShape(
+                        topStart = 9.dp,
+                        topEnd = 9.dp
+                    )
+                )
+                .padding(all = 16.dp)
+        ) {
+
+        }
+
+
     }
 }
 
