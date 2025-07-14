@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import com.faysal.zenify.ui.screen.MusicScreen
 import com.faysal.zenify.ui.screen.PlayerScreen
 import com.faysal.zenify.ui.theme.ZenifyTheme
 import com.faysal.zenify.ui.widgets.GestureMusicButton
@@ -43,7 +44,7 @@ class MainActivity : ComponentActivity() {
                         .background(Color.Transparent),
                     contentAlignment = Alignment.Center
                 ) {
-                    PlayerScreen()
+                    MusicScreen()
                 }
             }
         }
