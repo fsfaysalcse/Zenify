@@ -6,7 +6,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.provider.MediaStore
 import com.faysal.zenify.domain.repository.AudioRepository
-import com.faysal.zenify.ui.model.Audio
+import com.faysal.zenify.domain.model.Audio
 import com.faysal.zenify.ui.util.getEmbeddedCover
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

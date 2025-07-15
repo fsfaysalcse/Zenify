@@ -37,11 +37,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.viewModelScope
+import com.faysal.zenify.data.service.MusicServiceConnection
 import com.faysal.zenify.domain.repository.FakeAudioRepository
 import com.faysal.zenify.domain.usecases.GetAudiosUseCase
-import com.faysal.zenify.ui.MusicViewModel
+import com.faysal.zenify.ui.viewModels.MusicViewModel
 import com.faysal.zenify.ui.widgets.AudioItem
 import com.faysal.zenify.ui.widgets.PlayerBottomSheet
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -50,40 +53,43 @@ fun MusicScreen(viewModel: MusicViewModel = koinViewModel()) {
     val audios by viewModel.audios.collectAsState()
     val currentAudio by viewModel.currentAudio.collectAsState()
 
-    // Permissions
-    val permissions = mutableListOf(
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-            Manifest.permission.READ_MEDIA_AUDIO else Manifest.permission.READ_EXTERNAL_STORAGE
-    )
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        permissions.add(Manifest.permission.POST_NOTIFICATIONS)
+    val permissions = remember {
+        mutableListOf(
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+                Manifest.permission.READ_MEDIA_AUDIO
+            else Manifest.permission.READ_EXTERNAL_STORAGE
+        ).apply {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                add(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
     }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissionsResult ->
         val audioPermissionGranted = permissionsResult[permissions[0]] == true
-        val notificationPermissionGranted = if (permissions.size > 1) {
-            permissionsResult[Manifest.permission.POST_NOTIFICATIONS] == true
-        } else true
+        val notificationPermissionGranted = permissions.getOrNull(1)?.let {
+            permissionsResult[it] == true
+        } ?: true
         if (audioPermissionGranted && notificationPermissionGranted) {
-            viewModel.loadAudios(context)
+            viewModel.loadAudios()
         }
     }
 
     LaunchedEffect(Unit) {
         val audioPermissionGranted = ContextCompat.checkSelfPermission(
-            context,
-            permissions[0]
+            context, permissions[0]
         ) == PackageManager.PERMISSION_GRANTED
+
         val notificationPermissionGranted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.POST_NOTIFICATIONS
+                context, Manifest.permission.POST_NOTIFICATIONS
             ) == PackageManager.PERMISSION_GRANTED
         } else true
+
         if (audioPermissionGranted && notificationPermissionGranted) {
-            viewModel.loadAudios(context)
+            viewModel.loadAudios()
         } else {
             permissionLauncher.launch(permissions.toTypedArray())
         }
@@ -161,7 +167,7 @@ fun MusicScreen(viewModel: MusicViewModel = koinViewModel()) {
                         AudioItem(
                             audio = audio,
                             bitmapCache = bitmapCache,
-                            onClick = { viewModel.playAudio(context, audio) }
+                            onClick = { viewModel.playAudio(audio) }
                         )
                     }
                 }
@@ -181,15 +187,21 @@ fun MusicScreen(viewModel: MusicViewModel = koinViewModel()) {
 
 
 
-
 @Composable
 fun rememberFakeMusicViewModel(): MusicViewModel {
     val context = LocalContext.current
-    val repository = FakeAudioRepository()
+    val fakeRepository = FakeAudioRepository()
+    val fakeUseCase = GetAudiosUseCase(fakeRepository)
+    val fakeServiceConnection = remember { MusicServiceConnection(context) }
+
     return remember {
-        object : MusicViewModel(GetAudiosUseCase(repository)) {
-            init {
-                loadAudios(context)
+        MusicViewModel(
+            serviceConnection = fakeServiceConnection,
+            getAudiosUseCase = fakeUseCase
+        ).apply {
+            // preload mock data
+            viewModelScope.launch {
+                _audios.value = fakeUseCase()
             }
         }
     }

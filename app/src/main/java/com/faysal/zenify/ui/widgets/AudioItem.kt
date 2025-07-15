@@ -27,7 +27,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.faysal.zenify.R
-import com.faysal.zenify.ui.model.Audio
+import com.faysal.zenify.domain.model.Audio
 import com.faysal.zenify.ui.util.formatDuration
 import com.faysal.zenify.ui.util.getEmbeddedCover
 import kotlinx.coroutines.Dispatchers

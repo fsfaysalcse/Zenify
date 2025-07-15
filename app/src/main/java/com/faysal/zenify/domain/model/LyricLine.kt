@@ -1,4 +1,4 @@
-package com.faysal.zenify.ui.model
+package com.faysal.zenify.domain.model
 
 
 data class LyricLine(

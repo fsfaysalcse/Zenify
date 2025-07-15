@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    kotlin("plugin.serialization") version "2.2.0"
 }
 
 android {
@@ -69,4 +70,10 @@ dependencies {
     implementation(libs.androidx.media3.session)
     implementation(libs.androidx.media3.ui)
     implementation(libs.androidx.media3.ui.compose)
+
+
+    //DataStore
+    implementation(libs.androidx.datastore)
+    implementation(libs.androidx.preferance.datastore)
+    implementation(libs.kotlinx.serialization.json)
 }

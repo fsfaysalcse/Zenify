@@ -19,6 +19,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Zenify">
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -32,13 +33,24 @@
         </activity>
 
         <service
-            android:name=".service.MusicService"
+            android:name=".data.service.MusicService"
             android:exported="true"
             android:foregroundServiceType="mediaPlayback">
             <intent-filter>
                 <action android:name="androidx.media3.session.MediaSessionService"/>
             </intent-filter>
         </service>
+
+        <receiver android:name="androidx.media3.session.MediaButtonReceiver" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_BUTTON"/>
+                <action android:name="com.faysal.zenify.action.PREVIOUS"/>
+                <action android:name="com.faysal.zenify.action.NEXT"/>
+                <action android:name="com.faysal.zenify.action.REPEAT"/>
+                <action android:name="com.faysal.zenify.action.SHUFFLE"/>
+                <action android:name="com.faysal.zenify.action.PLAY_PAUSE"/>
+            </intent-filter>
+        </receiver>
 
     </application>
 

@@ -1,8 +1,7 @@
 package com.faysal.zenify.domain.repository
-import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
-import com.faysal.zenify.ui.model.Audio
+import com.faysal.zenify.domain.model.Audio
 
 class FakeAudioRepository : AudioRepository {
 

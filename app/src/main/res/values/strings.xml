@@ -1,3 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Zenify</string>
+
+    <!-- Music notification -->
+    <string name="music_notification_channel_name">Music Playback</string>
+    <string name="music_notification_channel_description">Controls for music playback</string>
+
+    <!-- Playback controls -->
+    <string name="play">Play</string>
+    <string name="pause">Pause</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+    <string name="repeat">Repeat</string>
+    <string name="shuffle">Shuffle</string>
+
+    <!-- Playback states -->
+    <string name="repeat_enabled">Repeat enabled</string>
+    <string name="repeat_disabled">Repeat disabled</string>
+    <string name="shuffle_enabled">Shuffle enabled</string>
+    <string name="shuffle_disabled">Shuffle disabled</string>
+
+    <!-- Default values -->
+    <string name="unknown_title">Unknown Title</string>
+    <string name="unknown_artist">Unknown Artist</string>
+    <string name="unknown_album">Unknown Album</string>
+
+    <!-- Service states -->
+    <string name="service_starting">Starting music service…</string>
+    <string name="service_stopped">Music service stopped</string>
+    <string name="loading_track">Loading track…</string>
+
+    <!-- Errors -->
+    <string name="error_playback_failed">Playback failed</string>
+    <string name="error_track_not_found">Track not found</string>
+    <string name="error_service_connection">Failed to connect to music service</string>
 </resources>
