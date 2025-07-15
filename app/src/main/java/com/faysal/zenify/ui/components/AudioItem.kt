@@ -1,4 +1,4 @@
-package com.faysal.zenify.ui.widgets
+package com.faysal.zenify.ui.components
 
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image

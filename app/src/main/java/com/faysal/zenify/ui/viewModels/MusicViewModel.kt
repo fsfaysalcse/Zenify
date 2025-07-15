@@ -1,8 +1,10 @@
 package com.faysal.zenify.ui.viewModels
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.util.UnstableApi
+import com.faysal.zenify.data.service.MusicService
 import com.faysal.zenify.data.service.MusicServiceConnection
 import com.faysal.zenify.domain.model.Audio
 import com.faysal.zenify.domain.usecases.GetAudiosUseCase
@@ -10,16 +12,21 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import org.koin.java.KoinJavaComponent.inject
 
+data class PlayerState(
+    val currentTrack: Audio? = null,
+    val isPlaying: Boolean = false
+)
 
 @UnstableApi
-class MusicViewModel(
+open class MusicViewModel(
     private val serviceConnection: MusicServiceConnection,
     private val getAudiosUseCase: GetAudiosUseCase
 ) : ViewModel() {
 
 
-    private val _audios = MutableStateFlow<List<Audio>>(emptyList())
+    val _audios = MutableStateFlow<List<Audio>>(emptyList())
     val audios: StateFlow<List<Audio>> get() = _audios
 
     private val _currentAudio = MutableStateFlow<Audio?>(null)
@@ -42,6 +49,8 @@ class MusicViewModel(
 
     private val _playlist = MutableStateFlow<List<Audio>>(emptyList())
     val playlist: StateFlow<List<Audio>> = _playlist.asStateFlow()
+
+
 
     init {
         serviceConnection.bindService()

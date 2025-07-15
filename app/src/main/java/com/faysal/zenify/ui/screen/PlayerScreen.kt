@@ -49,10 +49,10 @@ import com.faysal.zenify.domain.model.BlindingLights
 import com.faysal.zenify.ui.theme.AvenirNext
 import com.faysal.zenify.ui.theme.MusicGradient
 import com.faysal.zenify.ui.theme.MusicSecondaryColor
-import com.faysal.zenify.ui.widgets.GestureMusicButton
-import com.faysal.zenify.ui.widgets.LyricsCaption
-import com.faysal.zenify.ui.widgets.LyricsHeaderBar
-import com.faysal.zenify.ui.widgets.ZenWaveSeekBar
+import com.faysal.zenify.ui.components.GestureMusicButton
+import com.faysal.zenify.ui.components.LyricsCaption
+import com.faysal.zenify.ui.components.LyricsHeaderBar
+import com.faysal.zenify.ui.components.ZenWaveSeekBar
 
 data class Song(
     val title: String,

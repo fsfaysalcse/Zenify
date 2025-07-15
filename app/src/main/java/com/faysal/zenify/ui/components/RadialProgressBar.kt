@@ -1,4 +1,4 @@
-package com.faysal.zenify.ui.widgets
+package com.faysal.zenify.ui.components
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectDragGestures
