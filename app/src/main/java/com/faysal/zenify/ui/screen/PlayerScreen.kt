@@ -36,7 +36,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -45,6 +47,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.faysal.zenify.R
+import com.faysal.zenify.domain.model.Audio
 import com.faysal.zenify.domain.model.BlindingLights
 import com.faysal.zenify.ui.theme.AvenirNext
 import com.faysal.zenify.ui.theme.MusicGradient
@@ -53,28 +56,25 @@ import com.faysal.zenify.ui.components.GestureMusicButton
 import com.faysal.zenify.ui.components.LyricsCaption
 import com.faysal.zenify.ui.components.LyricsHeaderBar
 import com.faysal.zenify.ui.components.ZenWaveSeekBar
+import com.faysal.zenify.ui.util.getEmbeddedCover
+import com.faysal.zenify.ui.util.sampleAudios
 
-data class Song(
-    val title: String,
-    val artist: String,
-    val duration: String
-)
 
 @Composable
-fun PlayerScreen(modifier: Modifier = Modifier) {
+fun PlayerScreen(
+    isPlaying: Boolean,
+    currentAudio: Audio,
+    onPlayPauseClick: () -> Unit,
+    onMinimizeClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
 
+    val context = LocalContext.current
 
     var isPlaying by remember { mutableStateOf(false) }
     var currentSong by remember { mutableIntStateOf(0) }
 
     var progress by remember { mutableFloatStateOf(0.3f) }
-
-    val songs = listOf(
-        Song("Blinding Lights", "The Weekend", "3:45"),
-        Song("Digital Rain", "Neon Pulse", "4:12"),
-        Song("Cosmic Waves", "Stellar Drift", "5:03"),
-        Song("Urban Lights", "City Glow", "3:28")
-    )
 
     var currentTime by remember { mutableLongStateOf(33000) }
 
@@ -97,7 +97,7 @@ fun PlayerScreen(modifier: Modifier = Modifier) {
         ) {
             // Back Button
             IconButton(
-                onClick = { /* Handle back navigation */ },
+                onClick = onMinimizeClick,
                 modifier = Modifier.size(40.dp)
             ) {
                 Image(
@@ -110,7 +110,7 @@ fun PlayerScreen(modifier: Modifier = Modifier) {
 
             // Title
             Text(
-                text = "Playing Recommended Tracks",
+                text = "Now Playing",
                 color = Color.White,
                 fontSize = 14.sp,
                 fontFamily = AvenirNext,
@@ -156,19 +156,25 @@ fun PlayerScreen(modifier: Modifier = Modifier) {
                         contentAlignment = Alignment.Center
                     ) {
 
-                        Image(
-                            painter = painterResource(id = com.faysal.zenify.R.drawable.music_cover),
-                            contentDescription = "Music Note",
-                            modifier = Modifier
-                                .size(220.dp)
-                                .clip(CircleShape)
-                                .shadow(
-                                    elevation = 20.dp,
-                                    shape = CircleShape,
-                                    ambientColor = Color(0xFFFFFFFF),
-                                    spotColor = Color(0xFF000000)
-                                )
-                        )
+                        val musicCover = getEmbeddedCover(context = context, uri = currentAudio.uri)
+                        val imageBitmap = musicCover?.asImageBitmap()
+
+                        if (imageBitmap != null) {
+                            Image(
+                                bitmap = imageBitmap,
+                                contentDescription = "Music Note",
+                                modifier = Modifier
+                                    .size(220.dp)
+                                    .clip(CircleShape)
+                                    .shadow(
+                                        elevation = 20.dp,
+                                        shape = CircleShape,
+                                        ambientColor = Color(0xFFFFFFFF),
+                                        spotColor = Color(0xFF000000)
+                                    )
+                            )
+                        }
+
 
                         GestureMusicButton(
                             isPlaying = isPlaying,
@@ -198,7 +204,7 @@ fun PlayerScreen(modifier: Modifier = Modifier) {
                         ) {
 
                             Text(
-                                text = songs[currentSong].title,
+                                text = currentAudio.title,
                                 color = Color.White,
                                 fontSize = 22.sp,
                                 fontFamily = AvenirNext,
@@ -210,7 +216,7 @@ fun PlayerScreen(modifier: Modifier = Modifier) {
                                     .fillMaxWidth()
                             )
                             Text(
-                                text = songs[currentSong].artist,
+                                text = currentAudio.artist,
                                 color = Color.White.copy(alpha = 0.7f),
                                 fontSize = 16.sp,
                                 fontFamily = AvenirNext,
@@ -395,5 +401,12 @@ fun PlayerScreen(modifier: Modifier = Modifier) {
 @Preview(showBackground = true)
 @Composable
 fun PlayerScreenPreview() {
-    PlayerScreen()
+
+    PlayerScreen(
+        isPlaying = true,
+        currentAudio = sampleAudios.first(),
+        onPlayPauseClick = { /* Handle play/pause */ },
+        onMinimizeClick = { /* Handle minimize */ },
+        modifier = Modifier.fillMaxSize()
+    )
 }

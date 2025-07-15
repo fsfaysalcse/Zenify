@@ -1,36 +1,32 @@
 package com.faysal.zenify.ui.viewModels
 
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.util.UnstableApi
-import com.faysal.zenify.data.service.MusicService
 import com.faysal.zenify.data.service.MusicServiceConnection
 import com.faysal.zenify.domain.model.Audio
 import com.faysal.zenify.domain.usecases.GetAudiosUseCase
+import com.faysal.zenify.ui.states.MusicScreen
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import org.koin.java.KoinJavaComponent.inject
-
-data class PlayerState(
-    val currentTrack: Audio? = null,
-    val isPlaying: Boolean = false
-)
 
 @UnstableApi
-open class MusicViewModel(
+class MusicViewModel(
     private val serviceConnection: MusicServiceConnection,
-    private val getAudiosUseCase: GetAudiosUseCase
+    private val getAudiosUseCase: GetAudiosUseCase,
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-
-    val _audios = MutableStateFlow<List<Audio>>(emptyList())
-    val audios: StateFlow<List<Audio>> get() = _audios
+    private val _audios = MutableStateFlow<List<Audio>>(emptyList())
+    val audios: StateFlow<List<Audio>> get() = _audios.asStateFlow()
 
     private val _currentAudio = MutableStateFlow<Audio?>(null)
-    val currentAudio: StateFlow<Audio?> get() = _currentAudio
+    val currentAudio: StateFlow<Audio?> get() = _currentAudio.asStateFlow()
 
     private val _isPlaying = MutableStateFlow(false)
     val isPlaying: StateFlow<Boolean> = _isPlaying.asStateFlow()
@@ -50,31 +46,103 @@ open class MusicViewModel(
     private val _playlist = MutableStateFlow<List<Audio>>(emptyList())
     val playlist: StateFlow<List<Audio>> = _playlist.asStateFlow()
 
-
+    private val _backStack = mutableStateListOf<MusicScreen>()
+    val backStack: SnapshotStateList<MusicScreen> = _backStack
 
     init {
         serviceConnection.bindService()
         observeServiceConnection()
         loadAudios()
+
+        val saved = savedStateHandle.get<List<String>>("backStack")
+        if (saved != null) {
+            _backStack.addAll(saved.mapNotNull { MusicScreen.fromString(it) })
+        } else {
+            _backStack.add(MusicScreen.AlbumList)
+        }
+    }
+
+    fun push(screen: MusicScreen) {
+        _backStack.add(screen)
+        saveBackStack()
+    }
+
+    fun pop(): Boolean {
+        return if (_backStack.size > 1) {
+            _backStack.removeAt(_backStack.lastIndex)
+            saveBackStack()
+            true
+        } else {
+            false
+        }
+    }
+
+    fun resetBackStack(rootScreen: MusicScreen) {
+        backStack.clear()
+        backStack.add(rootScreen)
+        saveBackStack()
+    }
+
+    private fun saveBackStack() {
+        val stringList = _backStack.map { it.toString() }
+        savedStateHandle.set("backStack", stringList)
     }
 
     private fun observeServiceConnection() {
         viewModelScope.launch {
             serviceConnection.isConnected.collect { connected ->
-                if (connected) updatePlaybackState()
+                if (!connected) {
+                    _isPlaying.value = false
+                    _currentAudio.value = null
+                    _currentPosition.value = 0L
+                    _duration.value = 0L
+                    _isRepeatEnabled.value = false
+                    _isShuffleEnabled.value = false
+                    _playlist.value = emptyList()
+                }
             }
         }
-    }
 
-    private fun updatePlaybackState() {
         viewModelScope.launch {
-            _isPlaying.value = serviceConnection.isPlaying()
-            _currentAudio.value = serviceConnection.getCurrentAudio()
-            _currentPosition.value = serviceConnection.getCurrentPosition()
-            _duration.value = serviceConnection.getDuration()
-            _isRepeatEnabled.value = serviceConnection.isRepeatEnabled()
-            _isShuffleEnabled.value = serviceConnection.isShuffleEnabled()
-            _playlist.value = serviceConnection.getPlaylist()
+            serviceConnection.isPlayingFlow.collect { playing ->
+                _isPlaying.value = playing
+            }
+        }
+
+        viewModelScope.launch {
+            serviceConnection.currentAudioFlow.collect { audio ->
+                _currentAudio.value = audio
+            }
+        }
+
+        viewModelScope.launch {
+            serviceConnection.currentPositionFlow.collect { position ->
+                _currentPosition.value = position
+            }
+        }
+
+        viewModelScope.launch {
+            serviceConnection.durationFlow.collect { dur ->
+                _duration.value = dur
+            }
+        }
+
+        viewModelScope.launch {
+            serviceConnection.isRepeatEnabledFlow.collect { repeatEnabled ->
+                _isRepeatEnabled.value = repeatEnabled
+            }
+        }
+
+        viewModelScope.launch {
+            serviceConnection.isShuffleEnabledFlow.collect { shuffleEnabled ->
+                _isShuffleEnabled.value = shuffleEnabled
+            }
+        }
+
+        viewModelScope.launch {
+            serviceConnection.playlistFlow.collect { playlist ->
+                _playlist.value = playlist
+            }
         }
     }
 
@@ -86,12 +154,10 @@ open class MusicViewModel(
 
     fun playAudio(audio: Audio) {
         serviceConnection.playAudio(audio)
-        updatePlaybackState()
     }
 
     fun setPlaylist(audios: List<Audio>) {
         serviceConnection.setPlaylist(audios)
-        updatePlaybackState()
     }
 
     fun playPause() {
@@ -100,36 +166,26 @@ open class MusicViewModel(
         } else {
             serviceConnection.resumeAudio()
         }
-        updatePlaybackState()
     }
 
     fun playNext() {
         serviceConnection.playNext()
-        updatePlaybackState()
     }
 
     fun playPrevious() {
         serviceConnection.playPrevious()
-        updatePlaybackState()
     }
 
     fun toggleRepeat() {
         serviceConnection.toggleRepeat()
-        updatePlaybackState()
     }
 
     fun toggleShuffle() {
         serviceConnection.toggleShuffle()
-        updatePlaybackState()
     }
 
     fun seekTo(position: Long) {
         serviceConnection.seekTo(position)
-        _currentPosition.value = position
-    }
-
-    fun refreshPlaybackState() {
-        updatePlaybackState()
     }
 
     override fun onCleared() {

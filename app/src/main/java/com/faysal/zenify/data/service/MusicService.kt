@@ -1,6 +1,5 @@
 package com.faysal.zenify.data.service
 
-import android.app.Notification
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -26,10 +25,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import java.util.UUID
+import androidx.core.net.toUri
 
 private const val TAG = "MusicService"
 
@@ -50,6 +52,27 @@ class MusicService : MediaLibraryService() {
         private set
     var isShuffleEnabled = false
         private set
+
+    private val _isPlayingFlow = MutableStateFlow(false)
+    val isPlayingFlow: StateFlow<Boolean> = _isPlayingFlow
+
+    private val _currentAudioFlow = MutableStateFlow<Audio?>(null)
+    val currentAudioFlow: StateFlow<Audio?> = _currentAudioFlow
+
+    private val _currentPositionFlow = MutableStateFlow(0L)
+    val currentPositionFlow: StateFlow<Long> = _currentPositionFlow
+
+    private val _durationFlow = MutableStateFlow(0L)
+    val durationFlow: StateFlow<Long> = _durationFlow
+
+    private val _isRepeatEnabledFlow = MutableStateFlow(false)
+    val isRepeatEnabledFlow: StateFlow<Boolean> = _isRepeatEnabledFlow
+
+    private val _isShuffleEnabledFlow = MutableStateFlow(false)
+    val isShuffleEnabledFlow: StateFlow<Boolean> = _isShuffleEnabledFlow
+
+    private val _playlistFlow = MutableStateFlow<List<Audio>>(emptyList())
+    val playlistFlow: StateFlow<List<Audio>> = _playlistFlow
 
     private val broadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -114,6 +137,13 @@ class MusicService : MediaLibraryService() {
             override fun onIsPlayingChanged(isPlaying: Boolean) {
                 serviceScope.launch {
                     playbackStateManager.savePlayingState(isPlaying)
+                    _isPlayingFlow.value = isPlaying
+                }
+            }
+
+            override fun onPositionDiscontinuity(reason: Int) {
+                serviceScope.launch {
+                    _currentPositionFlow.value = player?.currentPosition ?: 0L
                 }
             }
         })
@@ -124,6 +154,9 @@ class MusicService : MediaLibraryService() {
             val newIndex = player?.currentMediaItemIndex ?: -1
             playlistManager.setCurrentIndex(newIndex)
             playbackStateManager.saveCurrentIndex(newIndex)
+            _currentAudioFlow.value = playlistManager.getCurrentAudio()
+            _playlistFlow.value = playlistManager.getCurrentPlaylist()
+            _durationFlow.value = player?.duration ?: 0L
         }
     }
 
@@ -138,6 +171,7 @@ class MusicService : MediaLibraryService() {
                 }
                 Player.STATE_READY -> {
                     playbackStateManager.saveCurrentPosition(player?.currentPosition ?: 0L)
+                    _durationFlow.value = player?.duration ?: 0L
                 }
             }
         }
@@ -154,31 +188,15 @@ class MusicService : MediaLibraryService() {
             context = this,
             service = this,
             onNotificationPosted = { notificationId, notification ->
-                handleNotificationPosted(notificationId, notification)
+                startForeground(notificationId, notification)
             },
             onNotificationCancelled = { notificationId, dismissedByUser ->
-                handleNotificationCancelled(notificationId, dismissedByUser)
+                if (dismissedByUser) pauseAudio()
             }
         )
-
         val manager = notificationManager!!.createNotificationManager()
         manager.setMediaSessionToken(mediaSession!!.platformToken)
         manager.setPlayer(player)
-    }
-
-    private fun handleNotificationPosted(notificationId: Int, notification: Notification) {
-        try {
-            startForeground(notificationId, notification)
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to start foreground service", e)
-            stopSelf()
-        }
-    }
-
-    private fun handleNotificationCancelled(notificationId: Int, dismissedByUser: Boolean) {
-        if (dismissedByUser) {
-            pauseAudio()
-        }
     }
 
     private fun restorePlaybackState() {
@@ -192,6 +210,9 @@ class MusicService : MediaLibraryService() {
 
                 isRepeatEnabled = savedRepeatState
                 isShuffleEnabled = savedShuffleState
+
+                _isRepeatEnabledFlow.value = savedRepeatState
+                _isShuffleEnabledFlow.value = savedShuffleState
 
                 player?.repeatMode = if (isRepeatEnabled) Player.REPEAT_MODE_ONE else Player.REPEAT_MODE_OFF
                 player?.shuffleModeEnabled = isShuffleEnabled
@@ -209,6 +230,10 @@ class MusicService : MediaLibraryService() {
                         player?.play()
                     }
                 }
+                _currentAudioFlow.value = playlistManager.getCurrentAudio()
+                _playlistFlow.value = playlistManager.getCurrentPlaylist()
+                _durationFlow.value = player?.duration ?: 0L
+                _isPlayingFlow.value = player?.isPlaying == true
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to restore playback state", e)
             }
@@ -225,6 +250,8 @@ class MusicService : MediaLibraryService() {
                     updatePlayerMediaItems()
                     player?.seekTo(index, 0)
                     player?.play()
+                    _currentAudioFlow.value = playlistManager.getCurrentAudio()
+                    _playlistFlow.value = playlistManager.getCurrentPlaylist()
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to play audio: ${audio.title}", e)
@@ -239,6 +266,8 @@ class MusicService : MediaLibraryService() {
                 updatePlayerMediaItems()
                 if (audios.isNotEmpty()) {
                     player?.play()
+                    _playlistFlow.value = playlistManager.getCurrentPlaylist()
+                    _currentAudioFlow.value = playlistManager.getCurrentAudio()
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to set playlist", e)
@@ -250,7 +279,6 @@ class MusicService : MediaLibraryService() {
         try {
             val mediaItems = playlistManager.createMediaItems()
             val currentIndex = playlistManager.currentIndex.value
-
             if (mediaItems.isNotEmpty()) {
                 player?.setMediaItems(mediaItems, currentIndex.coerceAtLeast(0), 0)
                 player?.prepare()
@@ -269,11 +297,15 @@ class MusicService : MediaLibraryService() {
                         playlistManager.setCurrentIndex(nextIndex)
                         player?.seekToNextMediaItem()
                         player?.play()
+                        _currentAudioFlow.value = playlistManager.getCurrentAudio()
+                        _playlistFlow.value = playlistManager.getCurrentPlaylist()
                     }
                 } else if (isRepeatEnabled) {
                     playlistManager.setCurrentIndex(0)
                     player?.seekTo(0, 0)
                     player?.play()
+                    _currentAudioFlow.value = playlistManager.getCurrentAudio()
+                    _playlistFlow.value = playlistManager.getCurrentPlaylist()
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to play next track", e)
@@ -290,6 +322,8 @@ class MusicService : MediaLibraryService() {
                         playlistManager.setCurrentIndex(previousIndex)
                         player?.seekToPreviousMediaItem()
                         player?.play()
+                        _currentAudioFlow.value = playlistManager.getCurrentAudio()
+                        _playlistFlow.value = playlistManager.getCurrentPlaylist()
                     }
                 }
             } catch (e: Exception) {
@@ -301,6 +335,7 @@ class MusicService : MediaLibraryService() {
     fun pauseAudio() {
         try {
             player?.pause()
+            _isPlayingFlow.value = false
         } catch (e: Exception) {
             Log.e(TAG, "Failed to pause audio", e)
         }
@@ -309,6 +344,7 @@ class MusicService : MediaLibraryService() {
     fun resumeAudio() {
         try {
             player?.play()
+            _isPlayingFlow.value = true
         } catch (e: Exception) {
             Log.e(TAG, "Failed to resume audio", e)
         }
@@ -320,6 +356,7 @@ class MusicService : MediaLibraryService() {
                 isRepeatEnabled = !isRepeatEnabled
                 player?.repeatMode = if (isRepeatEnabled) Player.REPEAT_MODE_ONE else Player.REPEAT_MODE_OFF
                 playbackStateManager.saveRepeatState(isRepeatEnabled)
+                _isRepeatEnabledFlow.value = isRepeatEnabled
                 notificationManager?.invalidate()
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to toggle repeat", e)
@@ -335,6 +372,7 @@ class MusicService : MediaLibraryService() {
                 playlistManager.setShuffleEnabled(isShuffleEnabled)
                 playbackStateManager.saveShuffleState(isShuffleEnabled)
                 updatePlayerMediaItems()
+                _isShuffleEnabledFlow.value = isShuffleEnabled
                 notificationManager?.invalidate()
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to toggle shuffle", e)
@@ -360,6 +398,7 @@ class MusicService : MediaLibraryService() {
             try {
                 player?.seekTo(position)
                 playbackStateManager.saveCurrentPosition(position)
+                _currentPositionFlow.value = position
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to seek to position", e)
             }
@@ -399,7 +438,7 @@ class MusicService : MediaLibraryService() {
                             title = title ?: "Unknown",
                             artist = artist ?: "Unknown",
                             album = "",
-                            uri = Uri.parse(uri),
+                            uri = uri.toUri(),
                             duration = 0L
                         )
                         playAudio(audio)

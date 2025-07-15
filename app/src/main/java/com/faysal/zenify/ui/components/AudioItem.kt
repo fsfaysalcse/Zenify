@@ -28,6 +28,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.faysal.zenify.R
 import com.faysal.zenify.domain.model.Audio
+import com.faysal.zenify.ui.theme.AvenirNext
 import com.faysal.zenify.ui.util.formatDuration
 import com.faysal.zenify.ui.util.getEmbeddedCover
 import kotlinx.coroutines.Dispatchers
@@ -94,16 +95,19 @@ fun AudioItem(
                 audio.title,
                 style = MaterialTheme.typography.bodyLarge,
                 maxLines = 1,
+                fontFamily = AvenirNext,
                 overflow = TextOverflow.Ellipsis
             )
             Text(
                 audio.artist,
                 style = MaterialTheme.typography.bodyMedium,
                 maxLines = 1,
+                fontFamily = AvenirNext,
                 overflow = TextOverflow.Ellipsis
             )
             Text(
                 formatDuration(audio.duration),
+                fontFamily = AvenirNext,
                 style = MaterialTheme.typography.bodySmall
             )
         }

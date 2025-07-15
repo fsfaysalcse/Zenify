@@ -10,7 +10,7 @@ import org.koin.dsl.module
 
 val appModule = module {
     single<AudioRepository> { AudioRepositoryImpl(get()) }
-    single { MusicViewModel(get(), get()) }
+    single { MusicViewModel(get(), get(),get()) }
     single { GetAudiosUseCase(get()) }
     single { MediaLibraryCallback() }
     single { MusicServiceConnection(get()) }
