@@ -76,4 +76,9 @@ dependencies {
     implementation(libs.androidx.datastore)
     implementation(libs.androidx.preferance.datastore)
     implementation(libs.kotlinx.serialization.json)
+
+    //Coil
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
+    implementation("androidx.palette:palette:1.0.0")
 }

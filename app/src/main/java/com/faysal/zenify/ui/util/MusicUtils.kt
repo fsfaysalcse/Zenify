@@ -9,7 +9,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import com.faysal.zenify.R
 
-fun getEmbeddedCover(context: Context, uri: Uri): Bitmap? {
+fun getEmbeddedCover(context: Context, uri: Uri?): Bitmap? {
     return try {
         val retriever = MediaMetadataRetriever()
         retriever.setDataSource(context, uri)

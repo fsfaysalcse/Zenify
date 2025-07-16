@@ -10,6 +10,7 @@ import androidx.media3.common.util.UnstableApi
 import com.faysal.zenify.domain.model.Audio
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -41,6 +42,7 @@ class MusicServiceConnection(
     val currentPositionFlow: StateFlow<Long> = _musicService.flatMapLatest { service ->
         service?.currentPositionFlow ?: MutableStateFlow(0L)
     }.stateIn(scope, SharingStarted.WhileSubscribed(5000), 0L)
+
 
     val durationFlow: StateFlow<Long> = _musicService.flatMapLatest { service ->
         service?.durationFlow ?: MutableStateFlow(0L)

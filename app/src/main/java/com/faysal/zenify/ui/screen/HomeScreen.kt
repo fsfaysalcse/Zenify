@@ -2,11 +2,14 @@ package com.faysal.zenify.ui.screen
 
 import android.graphics.Bitmap
 import androidx.annotation.OptIn
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -27,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -91,15 +95,13 @@ fun HomeScreen(
                 .background(MaterialTheme.colorScheme.surface)
                 .padding(bottom = if (currentAudio != null) 88.dp else 0.dp)
         ) {
-            Text(
-                text = stringResource(id = R.string.app_name),
-                color = MaterialTheme.colorScheme.onSurface,
-                fontFamily = AvenirNext,
-                fontSize = 32.sp,
-                letterSpacing = 5.sp,
-                fontWeight = FontWeight.ExtraBold,
-                modifier = Modifier.padding(horizontal = 16.dp),
+
+            Image(
+                painter = painterResource(id = R.drawable.bg_title_logo),
+                contentDescription = null,
+                modifier = Modifier.size(120.dp,60.dp).padding(start = 16.dp),
             )
+
 
             SearchBar(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
 
@@ -155,15 +157,16 @@ fun HomeScreen(
                 dragHandle = null // no drag handle
             ) {
                 PlayerScreen(
-                    isPlaying = isPlaying,
+                 /*   isPlaying = isPlaying,
                     currentAudio = currentAudio!!,
                     onPlayPauseClick = {
                         if (isPlaying) viewModel.playPause()
                         else viewModel.playAudio(currentAudio!!)
-                    },
+                    },*/
                     onMinimizeClick = {
                         showFullScreenPlayer = false
-                    }
+                    },
+                    viewModel = viewModel
                 )
             }
         }

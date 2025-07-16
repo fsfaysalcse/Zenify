@@ -1,5 +1,6 @@
 package com.faysal.zenify.ui.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -21,11 +22,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.faysal.zenify.R
 import com.faysal.zenify.domain.model.Audio
+import com.faysal.zenify.ui.util.getEmbeddedCover
 
 @Composable
 fun MiniPlayer(
@@ -35,10 +40,10 @@ fun MiniPlayer(
     onExpandClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp)
             .clickable { onExpandClick() },
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant
@@ -60,12 +65,20 @@ fun MiniPlayer(
                     .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_artist),
-                    contentDescription = "Album Art",
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(24.dp)
-                )
+
+                val musicCover =
+                    getEmbeddedCover(context = context, uri = currentAudio?.uri)
+                val imageBitmap = musicCover?.asImageBitmap()
+
+                if (imageBitmap != null) {
+                    Image(
+                        bitmap = imageBitmap,
+                        contentScale = ContentScale.Fit,
+                        contentDescription = "Album Art",
+                        modifier = Modifier.size(48.dp)
+                    )
+                }
+
             }
 
             Spacer(modifier = Modifier.width(12.dp))

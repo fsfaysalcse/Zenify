@@ -69,6 +69,7 @@ import kotlin.math.roundToInt
 @Composable
 fun GestureMusicButton(
     modifier: Modifier = Modifier,
+    trackBrush: Brush,
     isPlaying: Boolean,
     onPlayPause: (Boolean) -> Unit,
     onLongPress: () -> Unit,
@@ -125,7 +126,7 @@ fun GestureMusicButton(
                 .size(circleRadiusDp)
                 .border(
                     width = 3.dp,
-                    brush = TrackGradient,
+                    brush = trackBrush,
                     shape = CircleShape
                 )
         )
@@ -139,13 +140,7 @@ fun GestureMusicButton(
                 .size(buttonSizeDp)
                 .clip(CircleShape)
                 .background(
-                    Brush.linearGradient(
-                        colors = listOf(
-                            Color(0xFF1a1a2e),
-                            Color(0xFF16213e),
-                            animatedBrush
-                        ),
-                    ),
+                    brush = trackBrush,
                     alpha = knobBackgroundAlpha
                 )
                 .pointerInput(Unit) {
@@ -260,6 +255,7 @@ fun GestureMusicButtonPreview() {
     GestureMusicButton(
         isPlaying = isPlaying,
         onPlayPause = { isPlaying = it },
+        trackBrush = TrackGradient,
         onLongPress = { /* Handle long press */ },
         onSwipe = { direction -> println("Swiped: $direction") },
         onHold = { direction -> println("Held: $direction") }

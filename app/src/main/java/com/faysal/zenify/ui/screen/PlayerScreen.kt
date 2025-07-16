@@ -1,6 +1,7 @@
 package com.faysal.zenify.ui.screen
 
 import android.util.Log
+import androidx.annotation.OptIn
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
@@ -23,9 +24,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.asImageBitmap
@@ -46,43 +49,86 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.media3.common.util.UnstableApi
 import com.faysal.zenify.R
-import com.faysal.zenify.domain.model.Audio
 import com.faysal.zenify.domain.model.BlindingLights
-import com.faysal.zenify.ui.theme.AvenirNext
-import com.faysal.zenify.ui.theme.MusicGradient
-import com.faysal.zenify.ui.theme.MusicSecondaryColor
 import com.faysal.zenify.ui.components.GestureMusicButton
 import com.faysal.zenify.ui.components.LyricsCaption
 import com.faysal.zenify.ui.components.LyricsHeaderBar
 import com.faysal.zenify.ui.components.ZenWaveSeekBar
+import com.faysal.zenify.ui.theme.AvenirNext
+import com.faysal.zenify.ui.theme.MusicSecondaryColor
+import com.faysal.zenify.ui.util.ImageColors
+import com.faysal.zenify.ui.util.extractColorsFromImage
+import com.faysal.zenify.ui.util.extractColorsFromUri
 import com.faysal.zenify.ui.util.getEmbeddedCover
-import com.faysal.zenify.ui.util.sampleAudios
+import com.faysal.zenify.ui.viewModels.MusicViewModel
 
 
+@OptIn(UnstableApi::class)
 @Composable
 fun PlayerScreen(
-    isPlaying: Boolean,
-    currentAudio: Audio,
-    onPlayPauseClick: () -> Unit,
     onMinimizeClick: () -> Unit,
-    modifier: Modifier = Modifier
+    viewModel: MusicViewModel
 ) {
+
 
     val context = LocalContext.current
 
-    var isPlaying by remember { mutableStateOf(false) }
-    var currentSong by remember { mutableIntStateOf(0) }
 
-    var progress by remember { mutableFloatStateOf(0.3f) }
+    val duration by viewModel.duration.collectAsState()
+    val isPlaying by viewModel.isPlaying.collectAsState()
+    val currentAudio by viewModel.currentAudio.collectAsState()
+    val currentPosition by viewModel.currentPosition.collectAsState()
 
-    var currentTime by remember { mutableLongStateOf(33000) }
+
+    var progress by remember { mutableFloatStateOf(0f) }
+    var currentTime by remember { mutableLongStateOf(0L) }
+    var remainingTime by remember { mutableLongStateOf(0L) }
+
+
+    LaunchedEffect(currentPosition, duration) {
+        currentTime = currentPosition
+        remainingTime = duration - currentPosition
+        progress = if (duration > 0) currentPosition.toFloat() / duration else 0f
+
+        Log.d("PlaybackXD", "Played: ${currentTime}ms")
+        Log.d("PlaybackXD", "Remaining: ${remainingTime}ms")
+        Log.d("PlaybackXD", "Progress: ${"%.2f".format(progress)}")
+    }
+
+    val musicCover =
+        getEmbeddedCover(context = context, uri = currentAudio?.uri)
+    val imageBitmap = musicCover?.asImageBitmap()
+
+    var imageColors by remember { mutableStateOf(ImageColors()) }
+
+    LaunchedEffect(imageBitmap, currentAudio?.uri) {
+        imageColors = when {
+            imageBitmap != null -> extractColorsFromImage(imageBitmap)
+            currentAudio?.uri != null -> extractColorsFromUri(context, currentAudio?.uri.toString())
+            else -> ImageColors()
+        }
+    }
+
+    val vibrant = imageColors.vibrant.takeIf { it != Color.Unspecified } ?: Color(0xFF6A4ACB)
+    val muted = imageColors.muted.takeIf { it != Color.Unspecified } ?: Color(0xFF9C6BFF)
+    val dominant = imageColors.dominant.takeIf { it != Color.Unspecified } ?: Color(0xFF4C3E9A)
+
+    val gradientBrush = Brush.verticalGradient(
+        colors = listOf(
+            dominant.copy(alpha = 1f),
+            vibrant.copy(alpha = 0.8f),
+            muted.copy(alpha = 0.9f),
+        )
+    )
+
 
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(brush = MusicGradient)
+            .background(gradientBrush)
             .statusBarsPadding()
             .navigationBarsPadding(),
     ) {
@@ -156,8 +202,6 @@ fun PlayerScreen(
                         contentAlignment = Alignment.Center
                     ) {
 
-                        val musicCover = getEmbeddedCover(context = context, uri = currentAudio.uri)
-                        val imageBitmap = musicCover?.asImageBitmap()
 
                         if (imageBitmap != null) {
                             Image(
@@ -175,12 +219,30 @@ fun PlayerScreen(
                             )
                         }
 
-
                         GestureMusicButton(
                             isPlaying = isPlaying,
-                            onPlayPause = { isPlaying = it },
+                            onPlayPause = {
+                                if (isPlaying) {
+                                    viewModel.playPause()
+                                } else {
+                                    viewModel.playAudio(currentAudio!!)
+                                }
+                            },
+                            trackBrush = gradientBrush,
                             onLongPress = { /* Handle long press */ },
-                            onSwipe = { direction -> println("Swiped: $direction") },
+                            onSwipe = { direction ->
+                                println("Swiped: $direction")
+                                when (direction) {
+                                    "Right" -> {
+                                        viewModel.playNext()
+                                    }
+
+                                    "Left" -> {
+                                        viewModel.playPrevious()
+                                    }
+
+                                }
+                            },
                             onHold = { direction -> println("Held: $direction") }
                         )
                     }
@@ -204,7 +266,7 @@ fun PlayerScreen(
                         ) {
 
                             Text(
-                                text = currentAudio.title,
+                                text = currentAudio?.title ?: "Unknown",
                                 color = Color.White,
                                 fontSize = 22.sp,
                                 fontFamily = AvenirNext,
@@ -216,7 +278,7 @@ fun PlayerScreen(
                                     .fillMaxWidth()
                             )
                             Text(
-                                text = currentAudio.artist,
+                                text = currentAudio?.artist ?: "Unknown",
                                 color = Color.White.copy(alpha = 0.7f),
                                 fontSize = 16.sp,
                                 fontFamily = AvenirNext,
@@ -253,14 +315,11 @@ fun PlayerScreen(
                     ) {
                         ZenWaveSeekBar(
                             modifier = Modifier.fillMaxWidth(),
-                            progress = progress,
-                            onProgressChange = { progress = it },
-                            activeWaveColor = Color(0xFFFFFFFF),
-                            inactiveWaveColor = Color.White.copy(alpha = 0.1f),
-                            durationMs = 210000L,
-                            barWidth = 5.dp,
-                            barSpacing = 2.dp,
-                            maxBarHeight = 20.dp
+                            currentPositionMs = currentPosition,
+                            activeWaveColor = Color.White,
+                            inactiveWaveColor = imageColors.muted,
+                            durationMs = viewModel.duration.collectAsState().value,
+                            onSeek = { newPosition -> viewModel.seekTo(newPosition) }
                         )
                     }
 
@@ -275,7 +334,13 @@ fun PlayerScreen(
 
                         // Shuffle Button
                         IconButton(
-                            onClick = { /* Handle shuffle */ },
+                            onClick = {
+                                viewModel.toggleShuffle()
+                                Log.d(
+                                    "PlayerScreen",
+                                    "Shuffle toggled: ${viewModel.isShuffleEnabled.value}"
+                                )
+                            },
                             modifier = Modifier.size(48.dp)
                         ) {
                             Image(
@@ -287,7 +352,13 @@ fun PlayerScreen(
 
                         // Repeat Button
                         IconButton(
-                            onClick = { /* Handle repeat */ },
+                            onClick = {
+                                viewModel.toggleRepeat()
+                                Log.d(
+                                    "PlayerScreen",
+                                    "Repeat toggled: ${viewModel.isRepeatEnabled.value}"
+                                )
+                            },
                             modifier = Modifier.size(48.dp)
                         ) {
                             Image(
@@ -299,7 +370,10 @@ fun PlayerScreen(
 
                         // Share Button
                         IconButton(
-                            onClick = { /* Handle share */ },
+                            onClick = {
+                                Log.d("PlayerScreen", "Share clicked")
+                                // Handle share action here
+                            },
                             modifier = Modifier.size(48.dp)
                         ) {
                             Image(
@@ -311,7 +385,10 @@ fun PlayerScreen(
 
                         //Queue Button
                         IconButton(
-                            onClick = { /* Handle queue */ },
+                            onClick = {
+                                Log.d("PlayerScreen", "Queue clicked")
+                                // Handle queue action here
+                            },
                             modifier = Modifier.size(48.dp)
                         ) {
                             Image(
@@ -353,13 +430,6 @@ fun PlayerScreen(
             label = "lyrics_padding_animation"
         )
 
-        val lyricsBackgroundColor by animateColorAsState(
-            targetValue = if (isFullScreen) {
-                MusicSecondaryColor.copy(alpha = 1f)
-            } else {
-                MusicSecondaryColor.copy(alpha = 0.5f)
-            }
-        )
 
 
         Box(modifier = Modifier.fillMaxSize()) {
@@ -370,7 +440,7 @@ fun PlayerScreen(
                     .padding(horizontal = animateLyricsPadding)
                     .offset(y = animateLyricsOffsetY)
                     .background(
-                        color = MusicSecondaryColor,
+                        color = imageColors.vibrant,
                         shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
                     )
                     .padding(16.dp)
@@ -386,13 +456,6 @@ fun PlayerScreen(
                         Log.d("LyricsHeader", "FullScreen toggled: $isFullScreen")
                     }
                 )
-
-                LyricsCaption(
-                    song = BlindingLights,
-                    currentTimeMs = currentTime,
-                    isPlaying = isPlaying,
-                    modifier = Modifier.fillMaxSize()
-                )
             }
         }
     }
@@ -403,10 +466,7 @@ fun PlayerScreen(
 fun PlayerScreenPreview() {
 
     PlayerScreen(
-        isPlaying = true,
-        currentAudio = sampleAudios.first(),
-        onPlayPauseClick = { /* Handle play/pause */ },
         onMinimizeClick = { /* Handle minimize */ },
-        modifier = Modifier.fillMaxSize()
+        viewModel = rememberFakeMusicViewModel()
     )
 }

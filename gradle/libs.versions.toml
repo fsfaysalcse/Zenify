@@ -1,5 +1,6 @@
 [versions]
 agp = "8.11.1"
+coilCompose = "3.2.0"
 datastore = "1.1.7"
 kotlin = "2.2.0"
 coreKtx = "1.16.0"
@@ -26,6 +27,8 @@ androidx-media3-exoplayer = { module = "androidx.media3:media3-exoplayer", versi
 androidx-media3-session = { group = "androidx.media3", name = "media3-session", version.ref = "media3" }
 
 
+coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
+coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coilCompose" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }

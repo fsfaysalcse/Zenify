@@ -45,7 +45,7 @@ fun LyricsHeaderBar(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            text = "Lyrics",
+            text = "Music Queue",
             color = Color.White,
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,

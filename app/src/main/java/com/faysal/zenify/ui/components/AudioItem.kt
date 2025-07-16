@@ -71,6 +71,8 @@ fun AudioItem(
                     modifier = Modifier.size(60.dp)
                 )
             }
+
+            
             isLoading -> {
                 CircularProgressIndicator(
                     modifier = Modifier

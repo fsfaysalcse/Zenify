@@ -32,6 +32,8 @@ import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import java.util.UUID
 import androidx.core.net.toUri
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 
 private const val TAG = "MusicService"
 
@@ -147,7 +149,17 @@ class MusicService : MediaLibraryService() {
                 }
             }
         })
+
+        // Start coroutine to continuously update current position and duration
+        serviceScope.launch {
+            while (isActive) {
+                _currentPositionFlow.value = player?.currentPosition ?: 0L
+                _durationFlow.value = player?.duration ?: 0L
+                delay(500L)
+            }
+        }
     }
+
 
     private fun handleMediaItemTransition(mediaItem: MediaItem?) {
         serviceScope.launch {
