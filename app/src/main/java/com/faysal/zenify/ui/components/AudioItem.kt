@@ -30,6 +30,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -123,6 +124,7 @@ fun AudioItem(
                 fontWeight = FontWeight.SemiBold,
                 maxLines = 1,
                 fontFamily = AvenirNext,
+                color = Color.White,
                 overflow = TextOverflow.Ellipsis
             )
 
@@ -133,8 +135,8 @@ fun AudioItem(
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Medium,
                 maxLines = 1,
+                color = Color.White.copy(alpha = 0.6f),
                 fontFamily = AvenirNext,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                 overflow = TextOverflow.Ellipsis
             )
         }
@@ -144,14 +146,14 @@ fun AudioItem(
             Icon(
                 painter = painterResource(id = R.drawable.ic_more),
                 contentDescription = "More options",
-                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                tint = Color.White.copy(alpha = 0.6f),
                 modifier = Modifier.size(20.dp)
             )
         }
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
 @Composable
 fun AudioItemPreview() {
     val bitmapCache = mutableMapOf<Long, Bitmap?>()

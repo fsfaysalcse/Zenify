@@ -21,6 +21,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -82,7 +83,8 @@ fun CommonSongListScreen(
             IconButton(onClick = onBack) {
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
-                    contentDescription = "Back"
+                    contentDescription = "Back",
+                    tint = Color.White,
                 )
             }
         }
@@ -163,6 +165,7 @@ fun CommonSongListScreen(
                     fontSize = 9.sp,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
+                    color = Color.White,
                     fontFamily = AvenirNext,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.fillMaxWidth(),
@@ -173,6 +176,7 @@ fun CommonSongListScreen(
                     fontSize = 19.sp,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
+                    color = Color.White,
                     fontFamily = AvenirNext,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.fillMaxWidth()
@@ -188,7 +192,7 @@ fun CommonSongListScreen(
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Medium,
                         fontFamily = AvenirNext,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                        color = Color.White.copy(alpha = 0.6f)
                     )
                 )
 
@@ -207,7 +211,7 @@ fun CommonSongListScreen(
                 modifier = Modifier.weight(1f),
                 icon = painterResource(R.drawable.ic_play),
                 text = "Play",
-                onClick = { /* play logic */ },
+                onClick = {  onPlayAll(audios) },
                 backgroundColor = Color(0xFF000000),
                 contentColor = Color.White
             )
@@ -216,7 +220,7 @@ fun CommonSongListScreen(
                 modifier = Modifier.weight(1f),
                 icon = painterResource(R.drawable.ic_shuffle),
                 text = "Shuffle",
-                onClick = { onPlayAll(audios) },
+                onClick = { },
                 backgroundColor = Color(0xFFF2F3F5),
                 contentColor = Color.Black
             )
@@ -231,12 +235,17 @@ fun CommonSongListScreen(
                     bitmapCache = bitmapCache,
                     onClick = { onPlaySong(audio) }
                 )
+
+                HorizontalDivider(
+                    thickness = 0.8.dp,
+                    color = Color.White.copy(alpha = 0.1f)
+                )
             }
         }
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
 @Composable
 fun CommonSongListScreenPreview() {
     CommonSongListScreen(

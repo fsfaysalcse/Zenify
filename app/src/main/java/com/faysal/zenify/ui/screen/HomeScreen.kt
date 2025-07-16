@@ -36,6 +36,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -59,6 +61,7 @@ import com.faysal.zenify.ui.components.SearchBar
 import com.faysal.zenify.ui.states.MusicScreen
 import com.faysal.zenify.ui.theme.AvenirNext
 import com.faysal.zenify.ui.theme.ZenifyTheme
+import com.faysal.zenify.ui.theme.blackToNeveBlue
 import com.faysal.zenify.ui.viewModels.MusicViewModel
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -102,13 +105,13 @@ fun HomeScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.surface)
                 .padding(bottom = if (currentAudio != null) 88.dp else 0.dp)
         ) {
 
             Image(
                 painter = painterResource(id = R.drawable.bg_title_logo),
                 contentDescription = null,
+                colorFilter = ColorFilter.tint(Color.White),
                 modifier = Modifier.size(120.dp,60.dp).padding(start = 16.dp),
             )
 

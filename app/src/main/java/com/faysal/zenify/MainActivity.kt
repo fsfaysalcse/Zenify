@@ -17,6 +17,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.faysal.zenify.ui.screen.HomeScreen
 import com.faysal.zenify.ui.theme.ZenifyTheme
+import com.faysal.zenify.ui.theme.blackToDreamWave
+import com.faysal.zenify.ui.theme.blackToNeveBlue
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -37,6 +39,7 @@ class MainActivity : ComponentActivity() {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
+                        .background(blackToDreamWave)
                         .statusBarsPadding()
                         .navigationBarsPadding()
                         .background(Color.Transparent),

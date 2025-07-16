@@ -220,18 +220,6 @@ fun PlayerScreen(
                             )
                         }
 
-                        ZenCircleSeekBar(
-                            modifier = Modifier.size(300.dp), // or use .fillMaxWidth() for responsive sizing
-                            currentPositionMs = viewModel.currentPosition.collectAsState().value,
-                            durationMs = viewModel.duration.collectAsState().value,
-                            onSeek = { newPosition -> viewModel.seekTo(newPosition) },
-                            progressColor = Color.White,
-                            backgroundColor = imageColors.muted,
-                            thumbColor = Color.White.copy(alpha = 0.9f),
-                            strokeWidth = 6.dp,
-                            radius = 100.dp
-                        )
-
                         GestureMusicButton(
                             isPlaying = isPlaying,
                             onPlayPause = {

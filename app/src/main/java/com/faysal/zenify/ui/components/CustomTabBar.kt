@@ -22,6 +22,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.faysal.zenify.ui.theme.AvenirNext
+import com.faysal.zenify.ui.theme.MusicPrimaryColor
+import com.faysal.zenify.ui.theme.TabPrimary
 
 @Composable
 fun CustomTabBar(
@@ -47,9 +49,9 @@ fun CustomTabBar(
                     fontFamily = AvenirNext,
                     fontWeight = FontWeight.Medium,
                     color = if (index == selectedTabIndex)
-                        MaterialTheme.colorScheme.primary
+                        TabPrimary
                     else
-                        MaterialTheme.colorScheme.onSurface
+                       Color.White
                 )
 
                 Spacer(modifier = Modifier.height(4.dp))
@@ -60,7 +62,7 @@ fun CustomTabBar(
                         .width(30.dp)
                         .background(
                             if (index == selectedTabIndex)
-                                MaterialTheme.colorScheme.primary
+                                TabPrimary
                             else
                                 Color.Transparent,
                             shape = CircleShape

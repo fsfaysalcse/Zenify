@@ -19,6 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -85,6 +86,8 @@ fun AlbumsScreen(
                                 Text(
                                     text = album,
                                     fontFamily = AvenirNext,
+                                    color = Color.White,
+                                    maxLines = 1,
                                     style = MaterialTheme.typography.titleMedium
                                 )
                                 Text(
@@ -92,15 +95,15 @@ fun AlbumsScreen(
                                     style = MaterialTheme.typography.bodyMedium,
                                     fontFamily = AvenirNext,
                                     maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    color = Color.White.copy(alpha = 0.6f),
+                                    overflow = TextOverflow.Ellipsis
                                 )
                             }
                         }
 
                         HorizontalDivider(
                             thickness = 0.8.dp,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
+                            color = Color.White.copy(alpha = 0.1f)
                         )
                     }
                 }
