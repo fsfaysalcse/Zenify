@@ -30,6 +30,7 @@ val sampleAudios = listOf(
         artist = "The Weeknd",
         album = "After Hours",
         duration = 200000,
+        year = "2026",
         uri = "content://media/external/audio/media/1".toUri()
     ),
     Audio(
@@ -38,6 +39,7 @@ val sampleAudios = listOf(
         artist = "Ed Sheeran",
         album = "Divide",
         duration = 240000,
+        year = "2026",
         uri = "content://media/external/audio/media/2".toUri()
     ),
     Audio(
@@ -46,6 +48,7 @@ val sampleAudios = listOf(
         artist = "Adele",
         album = "21",
         duration = 285000,
+        year = "2026",
         uri = "content://media/external/audio/media/3".toUri()
     ),
     Audio(
@@ -54,6 +57,7 @@ val sampleAudios = listOf(
         artist = "Ed Sheeran",
         album = "Divide",
         duration = 263000,
+        year = "2026",
         uri = "content://media/external/audio/media/4".toUri()
     ),
     Audio(
@@ -62,6 +66,7 @@ val sampleAudios = listOf(
         artist = "The Weeknd",
         album = "Starboy",
         duration = 230000,
+        year = "2026",
         uri = "content://media/external/audio/media/5".toUri()
     ),
     Audio(
@@ -70,6 +75,7 @@ val sampleAudios = listOf(
         artist = "Adele",
         album = "21",
         duration = 228000,
+        year = "2026",
         uri = "content://media/external/audio/media/6".toUri()
     ),
     Audio(
@@ -78,6 +84,7 @@ val sampleAudios = listOf(
         artist = "Dua Lipa",
         album = "Future Nostalgia",
         duration = 203000,
+        year = "2026",
         uri = "content://media/external/audio/media/7".toUri()
     ),
     Audio(
@@ -86,6 +93,7 @@ val sampleAudios = listOf(
         artist = "Ed Sheeran",
         album = "=",
         duration = 231000,
+        year = "2026",
         uri = "content://media/external/audio/media/8".toUri()
     )
 )

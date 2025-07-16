@@ -24,7 +24,8 @@ data class SerializableAudio(
     val artist: String,
     val album: String,
     val uri: String,
-    val duration: Long
+    val duration: Long,
+    val year: String = ""
 )
 
 class PlaylistDataStore(private val context: Context) {
@@ -90,6 +91,7 @@ class PlaylistDataStore(private val context: Context) {
             artist = artist,
             album = album,
             uri = uri.toUri(),
+            year = year,
             duration = duration
         )
     }

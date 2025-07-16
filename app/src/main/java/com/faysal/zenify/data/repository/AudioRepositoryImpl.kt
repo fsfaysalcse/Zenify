@@ -24,7 +24,8 @@ class AudioRepositoryImpl(
             MediaStore.Audio.Media.TITLE,
             MediaStore.Audio.Media.ARTIST,
             MediaStore.Audio.Media.ALBUM,
-            MediaStore.Audio.Media.DURATION
+            MediaStore.Audio.Media.DURATION,
+            MediaStore.Audio.Media.YEAR,
         )
         val selection = "${MediaStore.Audio.Media.IS_MUSIC} != 0"
         val cursor = context.contentResolver.query(
@@ -40,6 +41,7 @@ class AudioRepositoryImpl(
         val artistCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)
         val albumCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM)
         val durationCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
+        val year = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.YEAR)
 
         while (cursor.moveToNext()) {
             val id = cursor.getLong(idCol)
@@ -47,9 +49,10 @@ class AudioRepositoryImpl(
             val artist = cursor.getString(artistCol)
             val album = cursor.getString(albumCol)
             val duration = cursor.getLong(durationCol)
+            val year = cursor.getInt(durationCol)
             val contentUri: Uri =
                 ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
-            list.add(Audio(id, title, artist, album, duration, contentUri))
+            list.add(Audio(id, title, artist, album, duration, year.toString(),contentUri))
         }
 
         cursor.close()

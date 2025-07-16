@@ -27,8 +27,10 @@ import androidx.core.net.toUri
 import androidx.media3.common.util.UnstableApi
 import com.faysal.zenify.R
 import com.faysal.zenify.domain.model.Audio
+import com.faysal.zenify.domain.model.UiTypes
 import com.faysal.zenify.ui.states.MusicScreen
 import com.faysal.zenify.ui.theme.AvenirNext
+import com.faysal.zenify.ui.util.sampleAudios
 import com.faysal.zenify.ui.viewModels.MusicViewModel
 
 @OptIn(UnstableApi::class)
@@ -123,6 +125,7 @@ fun ArtistsScreen(
                 title = artist,
                 audios = songs,
                 onBack = { backStack.removeAt(backStack.lastIndex) },
+                uiTypes = UiTypes.Artist,
                 onPlayAll = {
                     viewModel.setPlaylist(it)
                     viewModel.playAudio(it.first())
@@ -143,16 +146,6 @@ fun ArtistsScreen(
 @Preview(showBackground = true)
 @Composable
 fun ArtistsScreenScreenPreview() {
-    val sampleAudios = listOf(
-        Audio(
-            id = 1L,
-            title = "Song 1",
-            artist = "Artist A",
-            album = "Album X",
-            duration = 240000,
-            uri = "content://media/external/audio/media/1".toUri()
-        ),
-    )
 
     ArtistsScreen(
         audios = sampleAudios,

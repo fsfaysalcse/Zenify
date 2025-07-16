@@ -28,6 +28,7 @@ import com.faysal.zenify.R
 import com.faysal.zenify.domain.model.Audio
 import com.faysal.zenify.ui.theme.AvenirNext
 import com.faysal.zenify.ui.theme.MusicPrimaryColor
+import com.faysal.zenify.ui.util.sampleAudios
 
 
 @Composable
@@ -74,13 +75,6 @@ fun MusicBottomSheetPreview() {
         onPlayPauseClick = {},
         isPlaying = true,
         onMinimizeClick = {},
-        currentAudio = Audio(
-            id = 1L,
-            title = "Sample Track",
-            artist = "Sample Artist",
-            album = "Sample Album",
-            duration = 240000L,
-            uri = "/sample/path/to/track.mp3".toUri(),
-        )
+        currentAudio = sampleAudios.first()
     )
 }

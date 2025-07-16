@@ -2,12 +2,20 @@ package com.faysal.zenify.ui.screen
 
 import android.graphics.Bitmap
 import androidx.annotation.OptIn
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
@@ -78,6 +86,8 @@ fun HomeScreen(
 
     var showFullScreenPlayer by remember { mutableStateOf(false) }
 
+    val backStack = viewModel.backStack.last()
+
     // Push correct screen based on current tab
     LaunchedEffect(pagerState.currentPage) {
         when (pagerState.currentPage) {
@@ -103,15 +113,28 @@ fun HomeScreen(
             )
 
 
-            SearchBar(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
-
-            CustomTabBar(
-                tabs = tabs,
-                selectedTabIndex = pagerState.currentPage,
-                onTabSelected = { index ->
-                    coroutineScope.launch { pagerState.animateScrollToPage(index) }
-                }
+            val hideSearch by animateDpAsState(
+                targetValue = if (backStack.hideHomeScreen()) 0.dp else 130.dp,
+                animationSpec = tween(durationMillis = 200)
             )
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(hideSearch)
+            ) {
+                SearchBar(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
+
+                CustomTabBar(
+                    tabs = tabs,
+                    selectedTabIndex = pagerState.currentPage,
+                    onTabSelected = { index ->
+                        coroutineScope.launch { pagerState.animateScrollToPage(index) }
+                    }
+                )
+            }
+
+
 
             HorizontalPager(
                 state = pagerState,

@@ -8,5 +8,6 @@ data class Audio(
     val artist: String,
     val album: String,
     val duration: Long,
+    val year: String,
     val uri: Uri
 )

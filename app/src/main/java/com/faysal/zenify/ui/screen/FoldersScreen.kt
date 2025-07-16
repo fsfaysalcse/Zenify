@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.media3.common.util.UnstableApi
 import com.faysal.zenify.R
 import com.faysal.zenify.domain.model.Audio
+import com.faysal.zenify.domain.model.UiTypes
 import com.faysal.zenify.ui.states.MusicScreen
 import com.faysal.zenify.ui.theme.AvenirNext
 import com.faysal.zenify.ui.viewModels.MusicViewModel
@@ -130,6 +131,7 @@ fun FoldersScreen(
                 title = folderPath,
                 audios = songs,
                 onBack = { backStack.removeAt(backStack.lastIndex) },
+                uiTypes = UiTypes.Folder,
                 onPlayAll = {
                     viewModel.setPlaylist(it)
                     viewModel.playAudio(it.first())

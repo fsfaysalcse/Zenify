@@ -40,4 +40,9 @@ sealed class MusicScreen {
             else -> null
         }
     }
+
+    fun hideHomeScreen(): Boolean = when (this) {
+        is SongsList, is AlbumList, is ArtistList, is FolderList -> false
+        is AlbumSongs, is ArtistSongs, is FolderSongs -> true
+    }
 }

@@ -55,6 +55,7 @@ import com.faysal.zenify.domain.model.BlindingLights
 import com.faysal.zenify.ui.components.GestureMusicButton
 import com.faysal.zenify.ui.components.LyricsCaption
 import com.faysal.zenify.ui.components.LyricsHeaderBar
+import com.faysal.zenify.ui.components.ZenCircleSeekBar
 import com.faysal.zenify.ui.components.ZenWaveSeekBar
 import com.faysal.zenify.ui.theme.AvenirNext
 import com.faysal.zenify.ui.theme.MusicSecondaryColor
@@ -189,7 +190,7 @@ fun PlayerScreen(
                     .background(
                         color = Color.Black.copy(alpha = 0.3f)
                     )
-                    .padding(16.dp),
+                    .padding(horizontal = 16.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Column(
@@ -218,6 +219,18 @@ fun PlayerScreen(
                                     )
                             )
                         }
+
+                        ZenCircleSeekBar(
+                            modifier = Modifier.size(300.dp), // or use .fillMaxWidth() for responsive sizing
+                            currentPositionMs = viewModel.currentPosition.collectAsState().value,
+                            durationMs = viewModel.duration.collectAsState().value,
+                            onSeek = { newPosition -> viewModel.seekTo(newPosition) },
+                            progressColor = Color.White,
+                            backgroundColor = imageColors.muted,
+                            thumbColor = Color.White.copy(alpha = 0.9f),
+                            strokeWidth = 6.dp,
+                            radius = 100.dp
+                        )
 
                         GestureMusicButton(
                             isPlaying = isPlaying,
@@ -407,9 +420,6 @@ fun PlayerScreen(
 
         var isFullScreen by remember { mutableStateOf(false) }
 
-        val configuration = LocalConfiguration.current
-
-
         val screenHeight = LocalConfiguration.current.screenHeightDp.dp
 
         val animateLyricsHeight by animateDpAsState(
@@ -432,7 +442,7 @@ fun PlayerScreen(
 
 
 
-        Box(modifier = Modifier.fillMaxSize()) {
+        /*Box(modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -457,7 +467,7 @@ fun PlayerScreen(
                     }
                 )
             }
-        }
+        }*/
     }
 }
 

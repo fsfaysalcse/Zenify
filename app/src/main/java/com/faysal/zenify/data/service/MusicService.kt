@@ -451,6 +451,7 @@ class MusicService : MediaLibraryService() {
                             artist = artist ?: "Unknown",
                             album = "",
                             uri = uri.toUri(),
+                            year = "",
                             duration = 0L
                         )
                         playAudio(audio)
