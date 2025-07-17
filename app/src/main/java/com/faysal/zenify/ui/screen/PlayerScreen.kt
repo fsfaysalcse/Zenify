@@ -2,7 +2,6 @@ package com.faysal.zenify.ui.screen
 
 import android.util.Log
 import androidx.annotation.OptIn
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -13,14 +12,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -51,14 +46,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.media3.common.util.UnstableApi
 import com.faysal.zenify.R
-import com.faysal.zenify.domain.model.BlindingLights
 import com.faysal.zenify.ui.components.GestureMusicButton
-import com.faysal.zenify.ui.components.LyricsCaption
-import com.faysal.zenify.ui.components.LyricsHeaderBar
-import com.faysal.zenify.ui.components.ZenCircleSeekBar
-import com.faysal.zenify.ui.components.ZenWaveSeekBar
+import com.faysal.zenify.ui.components.RhythmTimeline
+import com.faysal.zenify.ui.states.GestureAction
 import com.faysal.zenify.ui.theme.AvenirNext
-import com.faysal.zenify.ui.theme.MusicSecondaryColor
 import com.faysal.zenify.ui.util.ImageColors
 import com.faysal.zenify.ui.util.extractColorsFromImage
 import com.faysal.zenify.ui.util.extractColorsFromUri
@@ -129,9 +120,7 @@ fun PlayerScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(gradientBrush)
-            .statusBarsPadding()
-            .navigationBarsPadding(),
+            .background(gradientBrush),
     ) {
 
         //Toolbar
@@ -199,7 +188,7 @@ fun PlayerScreen(
                 ) {
 
                     Box(
-                        modifier = Modifier.size(300.dp),
+                        modifier = Modifier.size(360.dp),
                         contentAlignment = Alignment.Center
                     ) {
 
@@ -209,59 +198,26 @@ fun PlayerScreen(
                                 bitmap = imageBitmap,
                                 contentDescription = "Music Note",
                                 modifier = Modifier
-                                    .size(220.dp)
-                                    .clip(CircleShape)
+                                    .size(320.dp)
+                                    .clip(RoundedCornerShape(12.dp))
                                     .shadow(
                                         elevation = 20.dp,
-                                        shape = CircleShape,
+                                        shape = RoundedCornerShape(12.dp),
                                         ambientColor = Color(0xFFFFFFFF),
                                         spotColor = Color(0xFF000000)
                                     )
                             )
                         }
-
-                        GestureMusicButton(
-                            isPlaying = isPlaying,
-                            onPlayPause = {
-                                if (isPlaying) {
-                                    viewModel.playPause()
-                                } else {
-                                    viewModel.playAudio(currentAudio!!)
-                                }
-                            },
-                            trackBrush = gradientBrush,
-                            onLongPress = { /* Handle long press */ },
-                            onSwipe = { direction ->
-                                println("Swiped: $direction")
-                                when (direction) {
-                                    "Right" -> {
-                                        viewModel.playNext()
-                                    }
-
-                                    "Left" -> {
-                                        viewModel.playPrevious()
-                                    }
-
-                                }
-                            },
-                            onHold = { direction -> println("Held: $direction") }
-                        )
                     }
 
 
                     // Song Title and Artist
 
-                    Row(
-                        modifier = Modifier
-                            .padding(top = 40.dp)
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-
                         Column(
-                            modifier = Modifier.weight(0.8f),
+                            modifier = Modifier
+                                .padding(top = 16.dp)
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp),
                             horizontalAlignment = Alignment.Start,
                             verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
@@ -272,8 +228,9 @@ fun PlayerScreen(
                                 fontSize = 22.sp,
                                 fontFamily = AvenirNext,
                                 lineHeight = 28.sp,
-                                fontWeight = FontWeight.Medium,
-                                textAlign = TextAlign.Start,
+                                maxLines = 1,
+                                fontWeight = FontWeight.SemiBold,
+                                textAlign = TextAlign.Center,
                                 overflow = TextOverflow.Ellipsis,
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -283,27 +240,10 @@ fun PlayerScreen(
                                 color = Color.White.copy(alpha = 0.7f),
                                 fontSize = 16.sp,
                                 fontFamily = AvenirNext,
-                                textAlign = TextAlign.Start,
+                                textAlign = TextAlign.Center,
                                 overflow = TextOverflow.Ellipsis,
                                 modifier = Modifier.fillMaxWidth()
                             )
-                        }
-
-                        //Bookmark Icon
-                        IconButton(
-                            onClick = { /* Handle bookmark click */ },
-                            modifier = Modifier
-                                .weight(0.2f)
-                                .size(40.dp)
-                                .clip(CircleShape)
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.ic_bookmark),
-                                contentDescription = "Bookmark",
-                                modifier = Modifier.size(27.dp),
-                                colorFilter = ColorFilter.tint(Color.White)
-                            )
-                        }
 
                     }
 
@@ -314,14 +254,93 @@ fun PlayerScreen(
                             .padding(horizontal = 16.dp, vertical = 15.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        ZenWaveSeekBar(
+                        RhythmTimeline(
                             modifier = Modifier.fillMaxWidth(),
                             currentPositionMs = currentPosition,
-                            activeWaveColor = Color.White,
-                            inactiveWaveColor = imageColors.muted,
                             durationMs = viewModel.duration.collectAsState().value,
                             onSeek = { newPosition -> viewModel.seekTo(newPosition) }
                         )
+
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth()
+                                .padding(horizontal = 16.dp),
+                            horizontalArrangement = Arrangement.SpaceAround,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_left),
+                                contentDescription = "Left",
+                                tint = Color.White,
+                                modifier = Modifier.size(20.dp)
+                            )
+
+
+                            GestureMusicButton(
+                                modifier = Modifier.padding(vertical = 20.dp),
+                                isPlaying = isPlaying,
+                                onPlayPause = {
+                                    viewModel.playPause()
+                                },
+                                coverPrimary = imageColors.vibrant,
+                                onLongPress = { /* Handle long press */ },
+                                onSwipe = { direction ->
+
+                                    when (direction) {
+                                        GestureAction.Right -> {
+                                            viewModel.playNext()
+                                            Log.d("GestureAction", "PlayerScreen: Right")
+                                        }
+
+                                        GestureAction.Left -> {
+                                            viewModel.playPrevious()
+                                            Log.d("GestureAction", "PlayerScreen: Left")
+                                        }
+
+                                        GestureAction.Up -> {
+                                            Log.d("GestureAction", "PlayerScreen: UP")
+                                        }
+
+                                        GestureAction.Down -> {
+                                            Log.d("GestureAction", "PlayerScreen: Down")
+                                        }
+
+                                        else -> Unit
+                                    }
+                                },
+                                onHold = { direction ->
+                                    when (direction) {
+                                        GestureAction.Hold.Left -> {
+                                            viewModel.playPrevious()
+                                            Log.d("GestureAction", "PlayerScreen: Hold Left")
+                                        }
+
+                                        GestureAction.Hold.Right -> {
+                                            viewModel.playNext()
+                                            Log.d("GestureAction", "PlayerScreen: Hold Right")
+                                        }
+
+                                        GestureAction.Hold.Up -> {
+                                            Log.d("GestureAction", "PlayerScreen: Hold Up")
+                                        }
+
+                                        GestureAction.Hold.Down -> {
+                                            Log.d("GestureAction", "PlayerScreen: Hold Down")
+                                        }
+                                    }
+                                }
+                            )
+
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_right),
+                                contentDescription = "Right",
+                                tint = Color.White,
+                                modifier = Modifier.size(20.dp)
+                            )
+
+                        }
+
                     }
 
 

@@ -170,12 +170,12 @@ fun ZenWaveSeekBar(
  */
 
 fun formatTime(ms: Long): String {
+    if (ms <= 0) return "00:00"
     val totalSec = ms / 1000
     val minutes = totalSec / 60
     val seconds = totalSec % 60
     return "%02d:%02d".format(minutes, seconds)
 }
-
 
 /**
  * Generates a random list of normalized waveform heights (0f..1f)

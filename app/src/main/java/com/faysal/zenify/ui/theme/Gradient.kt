@@ -71,7 +71,7 @@ val blackToDreamWave = Brush.verticalGradient(
     )
 )
 
-val blackToZenMystic = Brush.verticalGradient(
+val blackToZenMystic = Brush.horizontalGradient(
     colors = listOf(
         Color(0xFF000000), // pure black
         Color(0xFF0A0A1F), // midnight navy

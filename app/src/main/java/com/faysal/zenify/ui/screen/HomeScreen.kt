@@ -177,8 +177,8 @@ fun HomeScreen(
                     showFullScreenPlayer = false
                 },
                 sheetState = bottomSheetState,
-                containerColor = MaterialTheme.colorScheme.surface,
-                contentColor = MaterialTheme.colorScheme.onSurface,
+                containerColor = Color.Black,
+                contentColor = Color.Black,
                 shape = RectangleShape, // full-screen without rounded corners
                 dragHandle = null // no drag handle
             ) {
