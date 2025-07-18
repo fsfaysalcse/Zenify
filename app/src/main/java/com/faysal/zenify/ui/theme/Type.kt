@@ -8,6 +8,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.faysal.zenify.R
 
+
+val NavFont = FontFamily(
+    Font(R.font.nav_font, FontWeight.Bold),
+)
+
+
 val Nunito = FontFamily(
     Font(R.font.nunito_nans_regular, FontWeight.Normal),
     Font(R.font.nunito_sans_bold, FontWeight.Bold),

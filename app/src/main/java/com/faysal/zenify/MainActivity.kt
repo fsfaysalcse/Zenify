@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import com.faysal.zenify.ui.screen.DashboardScreen
 import com.faysal.zenify.ui.screen.HomeScreen
 import com.faysal.zenify.ui.theme.ZenifyTheme
 import com.faysal.zenify.ui.theme.blackToDreamWave
@@ -45,7 +46,7 @@ class MainActivity : ComponentActivity() {
                         .background(Color.Transparent),
                     contentAlignment = Alignment.Center
                 ) {
-                    HomeScreen()
+                    DashboardScreen()
                 }
             }
         }

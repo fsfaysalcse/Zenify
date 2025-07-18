@@ -89,10 +89,6 @@ val blackToZenMystic = Brush.horizontalGradient(
         Color(0xFFAD8BFA),
         Color(0xFFBF9FFD),
         Color(0xFFC9AEE8), // shifting to lighter tone
-        Color(0xFFD4BECC),
-        Color(0xFFBFD4E3), // soft pastel blue
-        Color(0xFFA3E4DB), // mint aqua
-        Color(0xFF8EE9C8)  // soft turquoise tail
     )
 )
 

@@ -107,15 +107,6 @@ fun HomeScreen(
                 .fillMaxSize()
                 .padding(bottom = if (currentAudio != null) 88.dp else 0.dp)
         ) {
-
-            Image(
-                painter = painterResource(id = R.drawable.bg_title_logo),
-                contentDescription = null,
-                colorFilter = ColorFilter.tint(Color.White),
-                modifier = Modifier.size(120.dp,60.dp).padding(start = 16.dp),
-            )
-
-
             val hideSearch by animateDpAsState(
                 targetValue = if (backStack.hideHomeScreen()) 0.dp else 130.dp,
                 animationSpec = tween(durationMillis = 200)
@@ -166,7 +157,7 @@ fun HomeScreen(
                 },
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = 16.dp)
+                    .padding(bottom = 0.dp)
             )
         }
 
@@ -192,7 +183,7 @@ fun HomeScreen(
                     onMinimizeClick = {
                         showFullScreenPlayer = false
                     },
-                    viewModel = viewModel
+                    viewModel = viewModel,
                 )
             }
         }
