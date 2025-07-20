@@ -71,6 +71,7 @@ fun DrawerItem(
 }
 
 
+/*
 @Preview(showBackground = true, backgroundColor = 0xFF000000)
 @Composable
 fun DrawerItemPreview() {
@@ -79,4 +80,4 @@ fun DrawerItemPreview() {
         drawer = DRAWER_ITEM.first(),
         onItemClick = {}
     )
-}
+}*/

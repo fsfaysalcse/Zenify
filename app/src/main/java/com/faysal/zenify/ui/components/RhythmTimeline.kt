@@ -267,6 +267,7 @@ private fun DrawScope.drawRhythmTimeline(
 }
 
 
+/*
 @Preview(showBackground = true, backgroundColor = 0xFF1A1A1A)
 @Composable
 fun RhythmTimelinePreview() {
@@ -284,4 +285,4 @@ fun RhythmTimelinePreview() {
             onSeek = { }
         )
     }
-}
+}*/

@@ -75,7 +75,7 @@ fun HomeScreen(
 ) {
     val pagerState = rememberPagerState(initialPage = 0) { 4 }
     val coroutineScope = rememberCoroutineScope()
-    val tabs = listOf("Songs", "Albums", "Artist", "Folder")
+    val tabs = listOf("Explore","Tracks", "Albums", "Artist", "Folder")
 
     val isPlaying by viewModel.isPlaying.collectAsState()
     val currentAudio by viewModel.currentAudio.collectAsState()
@@ -94,10 +94,11 @@ fun HomeScreen(
     // Push correct screen based on current tab
     LaunchedEffect(pagerState.currentPage) {
         when (pagerState.currentPage) {
-            0 -> viewModel.resetBackStack(MusicScreen.SongsList)
-            1 -> viewModel.resetBackStack(MusicScreen.AlbumList)
-            2 -> viewModel.resetBackStack(MusicScreen.ArtistList)
-            3 -> viewModel.resetBackStack(MusicScreen.FolderList)
+            0 -> viewModel.resetBackStack(MusicScreen.Overview)
+            1 -> viewModel.resetBackStack(MusicScreen.SongsList)
+            2 -> viewModel.resetBackStack(MusicScreen.AlbumList)
+            3 -> viewModel.resetBackStack(MusicScreen.ArtistList)
+            4 -> viewModel.resetBackStack(MusicScreen.FolderList)
         }
     }
 
@@ -135,10 +136,11 @@ fun HomeScreen(
                 modifier = Modifier.weight(1f)
             ) { page ->
                 when (page) {
-                    0 -> SongsScreen(audios, bitmapCache, viewModel)
-                    1 -> AlbumsScreen(audios, bitmapCache, viewModel)
-                    2 -> ArtistsScreen(audios, bitmapCache, viewModel)
-                    3 -> FoldersScreen(audios, bitmapCache, viewModel)
+                    0 -> OverviewScreen(audios, bitmapCache, viewModel)
+                    1 -> SongsScreen(audios, bitmapCache, viewModel)
+                    2 -> AlbumsScreen(audios, bitmapCache, viewModel)
+                    3 -> ArtistsScreen(audios, bitmapCache, viewModel)
+                    4 -> FoldersScreen(audios, bitmapCache, viewModel)
                 }
             }
         }

@@ -74,6 +74,7 @@ fun CustomTabBar(
 }
 
 
+/*
 @Preview(showBackground = true)
 @Composable
 fun CustomTabBarPreview() {
@@ -82,4 +83,4 @@ fun CustomTabBarPreview() {
         selectedTabIndex = 0,
         onTabSelected = {}
     )
-}
+}*/

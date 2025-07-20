@@ -26,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
@@ -53,9 +54,13 @@ fun DrawerScreen(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(blackToDreamWave)
     ){
 
+        Box(
+            modifier = Modifier.fillMaxSize()
+                .background(blackToDreamWave)
+                .blur(100.dp)
+        )
 
         Column(
             modifier = Modifier

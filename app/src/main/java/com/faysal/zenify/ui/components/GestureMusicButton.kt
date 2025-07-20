@@ -1,14 +1,3 @@
-/**
- * Enhanced GestureMusicButton with improved gesture detection and play/pause functionality
- *
- * Features:
- * - Reliable play/pause tap detection
- * - Smooth drag gestures (left/right for track control, up/down for volume)
- * - Hold gesture support with proper timing
- * - Haptic feedback for better user experience
- * - Animated visual feedback with scaling and icon transitions
- */
-
 package com.faysal.zenify.ui.components
 
 import android.util.Log
@@ -40,7 +29,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -53,7 +41,6 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.faysal.zenify.R
 import com.faysal.zenify.ui.states.GestureAction
-import com.faysal.zenify.ui.theme.TrackGradient
 import kotlinx.coroutines.delay
 import kotlin.math.abs
 import kotlin.math.roundToInt
@@ -82,6 +69,7 @@ fun GestureMusicButton(
     var holdTriggered by remember { mutableStateOf(false) }
     var gestureIcon by remember { mutableStateOf<Int?>(null) }
     var dragStartTime by remember { mutableLongStateOf(0L) }
+    var isHoldActive by remember { mutableStateOf(false) }
 
     val maxHorizontalDragPx = with(density) { (100.dp).toPx() }
     val maxVerticalDragPx = with(density) { (60.dp).toPx() }
@@ -145,14 +133,20 @@ fun GestureMusicButton(
         label = "AnimatedOffsetY"
     )
 
-    val knobBackgroundAlpha by animateFloatAsState(
-        targetValue = if (gestureIconAlpha == 0f) 0.5f else 0.8f + (dragIntensity * 0.2f),
-        animationSpec = tween(300, easing = FastOutSlowInEasing),
-        label = "KnobBackgroundAlpha"
-    )
+    val iconSize by remember {
+        derivedStateOf {
+            val isHorizontalGesture = currentGesture == GestureAction.Left || currentGesture == GestureAction.Right
+            if (gestureIcon != null && isHorizontalGesture && isDragging) {
+                (48 + (dragIntensity * 16)).dp
+            } else {
+                48.dp
+            }
+        }
+    }
 
-    LaunchedEffect(currentGesture, gestureConfirmed, isDragging) {
-        if (currentGesture != null && gestureConfirmed && !holdTriggered && isDragging) {
+    LaunchedEffect(currentGesture, gestureConfirmed, isDragging, isHoldActive) {
+        if (currentGesture != null && gestureConfirmed && !holdTriggered && isDragging && !isHoldActive) {
+            isHoldActive = true
             delay(600)
             if (currentGesture != null && !holdTriggered && isDragging) {
                 holdTriggered = true
@@ -168,6 +162,7 @@ fun GestureMusicButton(
                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                 }
             }
+            isHoldActive = false
         }
     }
 
@@ -202,10 +197,13 @@ fun GestureMusicButton(
                             isDragging = true
                             hasDraggedSignificantly = false
                             dragStartTime = System.currentTimeMillis()
+                            currentGesture = null
+                            gestureConfirmed = false
+                            holdTriggered = false
+                            gestureIcon = null
+                            isHoldActive = false
                         },
                         onDragEnd = {
-                            val dragDuration = System.currentTimeMillis() - dragStartTime
-
                             if (gestureConfirmed && !holdTriggered && currentGesture != null && hasDraggedSignificantly) {
                                 onSwipe(currentGesture!!)
                                 haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
@@ -219,6 +217,7 @@ fun GestureMusicButton(
                             gestureConfirmed = false
                             holdTriggered = false
                             gestureIcon = null
+                            isHoldActive = false
                         },
                         onDrag = { _, dragAmount ->
                             offsetX += dragAmount.x
@@ -256,6 +255,7 @@ fun GestureMusicButton(
                                     currentGesture = newGesture
                                     gestureConfirmed = true
                                     holdTriggered = false
+                                    isHoldActive = false
 
                                     haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
 
@@ -302,11 +302,9 @@ fun GestureMusicButton(
                     alpha = if (gestureIcon != null) gestureIconAlpha else 1f
                 ),
                 modifier = Modifier
-                    .size((48 + (dragIntensity * 8)).dp)
+                    .size(iconSize)
                     .graphicsLayer {
                         alpha = if (gestureIcon != null) gestureIconAlpha else 1f
-                        scaleX = 1f + (dragIntensity * 0.08f)
-                        scaleY = 1f + (dragIntensity * 0.08f)
                     }
             )
         }

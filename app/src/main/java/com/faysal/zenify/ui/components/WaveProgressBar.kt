@@ -184,7 +184,7 @@ fun generateZenWaveHeights(count: Int): List<Float> {
     return List(count) { Random.nextFloat() }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF1A1A1A)
+/*@Preview(showBackground = true, backgroundColor = 0xFF1A1A1A)
 @Composable
 fun ZenWaveSeekBarPreview() {
     Column(
@@ -201,4 +201,4 @@ fun ZenWaveSeekBarPreview() {
             onSeek = {  }
         )
     }
-}
+}*/

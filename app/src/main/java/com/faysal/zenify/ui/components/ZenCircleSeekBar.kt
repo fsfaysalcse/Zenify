@@ -167,7 +167,7 @@ fun ZenCircleSeekBar(
 
 
 
-@Preview(showBackground = true, backgroundColor = 0xFF1A1A1A)
+/*@Preview(showBackground = true, backgroundColor = 0xFF1A1A1A)
 @Composable
 fun ZenCircleSeekBarPreview() {
     Column(
@@ -184,4 +184,4 @@ fun ZenCircleSeekBarPreview() {
             onSeek = {  }
         )
     }
-}
+}*/

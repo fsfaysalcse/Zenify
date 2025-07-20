@@ -1,6 +1,7 @@
 package com.faysal.zenify.ui.states
 
 sealed class MusicScreen {
+    object Overview : MusicScreen()
     object SongsList : MusicScreen()
     object AlbumList : MusicScreen()
     object ArtistList : MusicScreen()
@@ -10,6 +11,7 @@ sealed class MusicScreen {
     data class FolderSongs(val folderPath: String) : MusicScreen()
 
     override fun toString(): String = when (this) {
+        is Overview -> Overview::class.simpleName!!
         is SongsList -> SongsList::class.simpleName!!
         is AlbumList -> AlbumList::class.simpleName!!
         is ArtistList -> ArtistList::class.simpleName!!
@@ -21,6 +23,7 @@ sealed class MusicScreen {
 
     companion object {
         fun fromString(value: String): MusicScreen? = when {
+            value == Overview::class.simpleName -> Overview
             value == SongsList::class.simpleName -> SongsList
             value == AlbumList::class.simpleName -> AlbumList
             value == ArtistList::class.simpleName -> ArtistList
@@ -42,7 +45,7 @@ sealed class MusicScreen {
     }
 
     fun hideHomeScreen(): Boolean = when (this) {
-        is SongsList, is AlbumList, is ArtistList, is FolderList -> false
-        is AlbumSongs, is ArtistSongs, is FolderSongs -> true
+        is SongsList, is AlbumList, is ArtistList, is FolderList , is Overview -> false
+          is AlbumSongs, is ArtistSongs, is FolderSongs -> true
     }
 }
