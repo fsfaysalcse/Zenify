@@ -6,8 +6,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -37,60 +37,50 @@ import com.faysal.zenify.ui.theme.AvenirNext
 @Composable
 fun LyricsHeaderBar(
     onShareClick: () -> Unit = {},
-    onFullScreenClick: () -> Unit = {}
+    onFullScreenClick: () -> Unit = {},
+    modifier: Modifier
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(
-            text = "Music Queue",
-            color = Color.White,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Bold,
-            fontFamily = AvenirNext,
-            modifier = Modifier.weight(0.7f)
-                .clickable { onFullScreenClick() }
-        )
-
-        Row(
-            modifier = Modifier.weight(0.3f),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            modifier = Modifier,
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.Start
         ) {
-
-            Spacer(modifier = Modifier.size(16.dp)) // Add space between buttons
-
-            Box(
+            Text(
+                text = "Up Next",
+                color = Color.White,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                fontFamily = AvenirNext,
                 modifier = Modifier
-                    .size(32.dp)
-                    .background(Color.Black.copy(alpha = 0.3f), shape = CircleShape)
-                    .clickable { onShareClick() },
-                contentAlignment = Alignment.Center
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_share),
-                    contentDescription = "Share",
-                    colorFilter = ColorFilter.tint(Color.White),
-                    modifier = Modifier.size(16.dp)
-                )
-            }
-
-            Box(
+            )
+            Text(
+                text = "Life without you",
+                color = Color.White,
+                fontSize = 9.sp,
+                fontWeight = FontWeight.Normal,
+                fontFamily = AvenirNext,
                 modifier = Modifier
-                    .clickable { onFullScreenClick() }
-                    .size(32.dp)
-                    .background(Color.Black.copy(alpha = 0.3f), shape = CircleShape),
-                contentAlignment = Alignment.Center
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_full_screen),
-                    contentDescription = "Full Screen",
-                    colorFilter = ColorFilter.tint(Color.White),
-                    modifier = Modifier.size(16.dp)
-                )
-            }
+            )
+        }
+
+        Box(
+            modifier = Modifier
+                .size(32.dp)
+                .background(Color.Black.copy(alpha = 0.3f), shape = CircleShape)
+                .clickable { onFullScreenClick() },
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_up),
+                contentDescription = "Share",
+                colorFilter = ColorFilter.tint(Color.White),
+                modifier = Modifier.size(16.dp)
+            )
         }
     }
 }
@@ -105,7 +95,8 @@ fun LyricsHeaderBarPreview() {
         ) {
             LyricsHeaderBar(
                 onShareClick = {},
-                onFullScreenClick = {}
+                onFullScreenClick = {},
+                modifier = Modifier.fillMaxWidth()
             )
         }
     }

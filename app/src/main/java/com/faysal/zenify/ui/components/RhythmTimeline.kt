@@ -61,14 +61,13 @@ fun RhythmTimeline(
     progressGradient: Brush = Brush.horizontalGradient(
         colors = listOf(
             Color(0xFF8B5CF6),
-            Color(0xFFEC4899),
-            Color(0xFFF59E0B)
+            Color(0xFFFFFFFF)
         )
     ),
     trackColor: Color = Color.White.copy(alpha = 0.15f),
     thumbColor: Color = Color.White,
     trackHeight: Float = 4f,
-    thumbRadius: Float = 8f,
+    thumbRadius: Float = 1f,
     glowEffect: Boolean = true
 ) {
     val density = LocalDensity.current
@@ -267,7 +266,6 @@ private fun DrawScope.drawRhythmTimeline(
 }
 
 
-/*
 @Preview(showBackground = true, backgroundColor = 0xFF1A1A1A)
 @Composable
 fun RhythmTimelinePreview() {
@@ -285,4 +283,4 @@ fun RhythmTimelinePreview() {
             onSeek = { }
         )
     }
-}*/
+}

@@ -17,7 +17,10 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.faysal.zenify.ui.theme.ProductSans
 
 @Composable
 fun IconTextButton(
@@ -37,6 +40,14 @@ fun IconTextButton(
     ) {
         Icon(icon, contentDescription = null, modifier = Modifier.size(20.dp))
         Spacer(modifier = Modifier.width(8.dp))
-        Text(text)
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyLarge,
+            color = contentColor,
+            maxLines = 1,
+            fontFamily = ProductSans,
+            fontWeight = FontWeight.SemiBold,
+            overflow = TextOverflow.Ellipsis
+        )
     }
 }

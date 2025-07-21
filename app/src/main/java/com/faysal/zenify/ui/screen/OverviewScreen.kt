@@ -74,7 +74,8 @@ fun OverviewScreen(
             ) {
                 Text(
                     text = "Albums",
-                    style = MaterialTheme.typography.headlineSmall,
+                    fontSize = 23.sp,
+                    letterSpacing = 3.sp,
                     fontFamily = NavFont,
                     fontWeight = FontWeight.Bold,
                     color = Color.White
@@ -138,7 +139,8 @@ fun OverviewScreen(
             ) {
                 Text(
                     text = "Top Songs",
-                    style = MaterialTheme.typography.headlineSmall,
+                    fontSize = 23.sp,
+                    letterSpacing = 3.sp,
                     fontFamily = NavFont,
                     fontWeight = FontWeight.Bold,
                     color = Color.White

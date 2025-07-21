@@ -3,7 +3,6 @@ package com.faysal.zenify.ui.screen
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,17 +13,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -35,8 +32,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -53,16 +52,16 @@ import com.faysal.zenify.ui.components.IconTextButton
 import com.faysal.zenify.ui.components.MarqueeText
 import com.faysal.zenify.ui.theme.AvenirNext
 import com.faysal.zenify.ui.theme.MusicPrimaryColor
+import com.faysal.zenify.ui.theme.ZenifyPrimary
 import com.faysal.zenify.ui.util.extractHeaderInfo
 import com.faysal.zenify.ui.util.getEmbeddedCover
 import com.faysal.zenify.ui.util.sampleAudios
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-
 @Composable
 fun CommonSongListScreen(
-    title : String,
+    title: String,
     audios: List<Audio>,
     onBack: () -> Unit,
     uiTypes: UiTypes = UiTypes.Album,
@@ -70,55 +69,49 @@ fun CommonSongListScreen(
     onPlaySong: (Audio) -> Unit,
     bitmapCache: MutableMap<Long, Bitmap?>
 ) {
+    val context = LocalContext.current
+    val firstItem = audios.firstOrNull()
+    var isLoading by remember(firstItem?.id) { mutableStateOf(true) }
+
+    LaunchedEffect(firstItem?.uri) {
+        if (!bitmapCache.contains(firstItem?.id)) {
+            isLoading = true
+            val art = withContext(Dispatchers.IO) {
+                getEmbeddedCover(context, firstItem?.uri)
+            }
+            firstItem?.id?.let { bitmapCache[it] = art }
+            isLoading = false
+        } else {
+            isLoading = false
+        }
+    }
+
+    val headerInfo = extractHeaderInfo(title, audios, uiTypes)
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
+        IconButton(
+            onClick = onBack,
+            modifier = Modifier.size(40.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.ArrowBack,
+                contentDescription = null,
+                tint = Color.White
+            )
+        }
 
         Box(
-            modifier = Modifier.size(40.dp),
-            contentAlignment = Alignment.TopStart
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(240.dp)
         ) {
-            IconButton(onClick = onBack) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    contentDescription = "Back",
-                    tint = Color.White,
-                )
-            }
-        }
-
-
-
-        val firstItem = audios.firstOrNull()
-
-        val context = LocalContext.current
-        var isLoading by remember(firstItem?.id) { mutableStateOf(true) }
-
-        LaunchedEffect(firstItem?.uri) {
-            if (!bitmapCache.contains(firstItem?.id)) {
-                isLoading = true
-                val art = withContext(Dispatchers.IO) {
-                    getEmbeddedCover(context, firstItem?.uri)
-                }
-                bitmapCache[firstItem!!.id] = art
-                isLoading = false
-            } else {
-                isLoading = false
-            }
-        }
-
-
-        Row(
-            modifier = Modifier.fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 10.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Album Art or Placeholder
             Box(
                 modifier = Modifier
-                    .size(130.dp)
+                    .fillMaxSize()
                     .clip(RoundedCornerShape(8.dp))
                     .background(MusicPrimaryColor)
             ) {
@@ -127,9 +120,11 @@ fun CommonSongListScreen(
                         Image(
                             bitmap = bitmapCache[firstItem?.id]!!.asImageBitmap(),
                             contentDescription = null,
+                            contentScale = ContentScale.Crop,
                             modifier = Modifier.fillMaxSize()
                         )
                     }
+
                     isLoading -> {
                         CircularProgressIndicator(
                             strokeWidth = 2.dp,
@@ -138,6 +133,7 @@ fun CommonSongListScreen(
                                 .size(28.dp)
                         )
                     }
+
                     else -> {
                         Image(
                             painter = painterResource(id = R.drawable.default_cover),
@@ -148,43 +144,52 @@ fun CommonSongListScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.width(12.dp))
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .fillMaxWidth()
+                    .background(
+                        Brush.verticalGradient(
+                            listOf(
+                                Color.Transparent,
+                                Color.Black.copy(alpha = 0.1f),
+                                Color.Black.copy(alpha = 0.2f),
+                                Color.Black.copy(alpha = 0.4f),
+                                Color.Black.copy(alpha = 0.6f),
+                                Color.Black.copy(alpha = 0.8f),
+                                Color.Black
+                            )
+                        )
+                    )
+                    .height(100.dp)
+            )
 
-            val headerInfo = extractHeaderInfo(title, audios, uiTypes)
-
-            // Title & Artist
             Column(
                 modifier = Modifier
-                    .weight(1f)
-                    .padding(end = 8.dp),
-                verticalArrangement = Arrangement.Center
+                    .align(Alignment.BottomStart)
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 10.dp),
+                verticalArrangement = Arrangement.Top
             ) {
-
                 Text(
                     text = headerInfo.hint,
                     fontSize = 9.sp,
                     fontWeight = FontWeight.Bold,
-                    maxLines = 1,
                     color = Color.White,
                     fontFamily = AvenirNext,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.fillMaxWidth(),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
-
                 Text(
                     text = title,
                     fontSize = 19.sp,
                     fontWeight = FontWeight.Bold,
-                    maxLines = 1,
                     color = Color.White,
                     fontFamily = AvenirNext,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.fillMaxWidth()
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
-
                 Spacer(modifier = Modifier.height(2.dp))
-
-
                 MarqueeText(
                     text = headerInfo.subTitle,
                     modifier = Modifier.fillMaxWidth(),
@@ -195,8 +200,6 @@ fun CommonSongListScreen(
                         color = Color.White.copy(alpha = 0.6f)
                     )
                 )
-
-
             }
         }
 
@@ -211,16 +214,15 @@ fun CommonSongListScreen(
                 modifier = Modifier.weight(1f),
                 icon = painterResource(R.drawable.ic_play),
                 text = "Play",
-                onClick = {  onPlayAll(audios) },
-                backgroundColor = Color(0xFF000000),
+                onClick = { onPlayAll(audios) },
+                backgroundColor = ZenifyPrimary,
                 contentColor = Color.White
             )
-
             IconTextButton(
                 modifier = Modifier.weight(1f),
                 icon = painterResource(R.drawable.ic_shuffle),
                 text = "Shuffle",
-                onClick = { },
+                onClick = { /* TODO */ },
                 backgroundColor = Color(0xFFF2F3F5),
                 contentColor = Color.Black
             )
@@ -228,23 +230,29 @@ fun CommonSongListScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        LazyColumn {
-            items(audios) { audio ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+        ) {
+            audios.forEachIndexed { index, music ->
                 AudioItem(
-                    audio = audio,
+                    audio = music,
                     bitmapCache = bitmapCache,
-                    onClick = { onPlaySong(audio) }
+                    onClick = { onPlaySong(music) }
                 )
 
-                HorizontalDivider(
-                    thickness = 0.8.dp,
-                    color = Color.White.copy(alpha = 0.1f)
-                )
+                if (index < audios.lastIndex) {
+                    HorizontalDivider(
+                        thickness = 0.8.dp,
+                        color = Color.White.copy(alpha = 0.1f)
+                    )
+                }
             }
         }
     }
 }
-/*
+
 @Preview(showBackground = true, backgroundColor = 0xFF000000)
 @Composable
 fun CommonSongListScreenPreview() {
@@ -256,4 +264,4 @@ fun CommonSongListScreenPreview() {
         onPlaySong = {},
         bitmapCache = mutableMapOf()
     )
-}*/
+}

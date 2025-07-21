@@ -11,8 +11,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -24,7 +24,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
 import androidx.media3.common.util.UnstableApi
 import com.faysal.zenify.R
 import com.faysal.zenify.domain.model.Audio
@@ -58,49 +57,50 @@ fun AlbumsScreen(
                 tracks.distinct().joinToString(", ") { it.artist }
             }
 
-            Column(modifier = Modifier.fillMaxSize()) {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 8.dp)
-                ) {
-                    items(albums) { album ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    backStack.add(MusicScreen.AlbumSongs(album))
-                                }
-                                .padding(8.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.ic_album),
-                                contentDescription = "Album",
-                                modifier = Modifier
-                                    .size(58.dp)
-                                    .padding(end = 12.dp)
-                            )
-
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    text = album,
-                                    fontFamily = AvenirNext,
-                                    color = Color.White,
-                                    maxLines = 1,
-                                    style = MaterialTheme.typography.titleMedium
-                                )
-                                Text(
-                                    text = albumArtist[album] ?: "-",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    fontFamily = AvenirNext,
-                                    maxLines = 1,
-                                    color = Color.White.copy(alpha = 0.6f),
-                                    overflow = TextOverflow.Ellipsis
-                                )
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 8.dp)
+            ) {
+                albums.forEachIndexed { index, album ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                backStack.add(MusicScreen.AlbumSongs(album))
                             }
-                        }
+                            .padding(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_album),
+                            contentDescription = "Album",
+                            modifier = Modifier
+                                .size(58.dp)
+                                .padding(end = 12.dp)
+                        )
 
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = album,
+                                fontFamily = AvenirNext,
+                                color = Color.White,
+                                maxLines = 1,
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                            Text(
+                                text = albumArtist[album] ?: "-",
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontFamily = AvenirNext,
+                                maxLines = 1,
+                                color = Color.White.copy(alpha = 0.6f),
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                    }
+
+                    if (index < audios.lastIndex) {
                         HorizontalDivider(
                             thickness = 0.8.dp,
                             color = Color.White.copy(alpha = 0.1f)
