@@ -67,7 +67,7 @@ fun RhythmTimeline(
     trackColor: Color = Color.White.copy(alpha = 0.15f),
     thumbColor: Color = Color.White,
     trackHeight: Float = 4f,
-    thumbRadius: Float = 1f,
+    thumbRadius: Float = 8f,
     glowEffect: Boolean = true
 ) {
     val density = LocalDensity.current

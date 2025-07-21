@@ -3,24 +3,31 @@ package com.faysal.zenify.ui.screen
 import android.graphics.RenderEffect
 import android.graphics.RuntimeShader
 import android.os.Build
-import android.util.Log
 import androidx.annotation.OptIn
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -43,18 +50,23 @@ import androidx.compose.ui.graphics.asComposeRenderEffect
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
 import androidx.media3.common.util.UnstableApi
 import com.faysal.zenify.R
 import com.faysal.zenify.ui.components.GestureMusicButton
-import com.faysal.zenify.ui.components.LyricsHeaderBar
 import com.faysal.zenify.ui.components.RhythmTimeline
 import com.faysal.zenify.ui.shaders.MUSIC_SHADER
 import com.faysal.zenify.ui.states.GestureAction
@@ -71,6 +83,7 @@ fun PlayerScreen(
     onMinimizeClick: () -> Unit,
     viewModel: MusicViewModel
 ) {
+
     val context = LocalContext.current
 
     val isPlaying by viewModel.isPlaying.collectAsState()
@@ -82,6 +95,8 @@ fun PlayerScreen(
     val imageBitmap = musicCover?.asImageBitmap()
 
     var imageColors by remember { mutableStateOf(ImageColors()) }
+    var screenSize by remember { mutableStateOf(IntSize.Zero) }
+    val density = LocalDensity.current
 
     LaunchedEffect(imageBitmap, currentAudio?.uri) {
         imageColors = when {
@@ -90,15 +105,19 @@ fun PlayerScreen(
             else -> ImageColors()
         }
     }
-
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black)
+            .onSizeChanged { screenSize = it }
     ) {
+        val width = with(density) { screenSize.width.toDp() }
+        val height = with(density) { screenSize.height.toDp() }
+
         BackgroundShader(imageColors)
-        PlayerHeader(onMinimizeClick)
-        PlayerContent(
+
+        PortraitPlayerLayout(
+            onMinimizeClick = onMinimizeClick,
             imageBitmap = imageBitmap,
             currentAudioTitle = currentAudio?.title ?: "Unknown",
             currentAudioArtist = currentAudio?.artist ?: "Unknown",
@@ -106,7 +125,9 @@ fun PlayerScreen(
             currentPosition = currentPosition,
             duration = duration,
             imageColors = imageColors,
-            viewModel = viewModel
+            viewModel = viewModel,
+            maxWidth = width,
+            maxHeight = height
         )
     }
 }
@@ -152,38 +173,99 @@ private fun BackgroundShader(imageColors: ImageColors) {
     }
 }
 
+@UnstableApi
 @Composable
-private fun PlayerHeader(onMinimizeClick: () -> Unit) {
-    Row(
+private fun PortraitPlayerLayout(
+    onMinimizeClick: () -> Unit,
+    imageBitmap: ImageBitmap?,
+    currentAudioTitle: String,
+    currentAudioArtist: String,
+    isPlaying: Boolean,
+    currentPosition: Long,
+    duration: Long,
+    imageColors: ImageColors,
+    viewModel: MusicViewModel,
+    maxWidth: Dp,
+    maxHeight: Dp
+) {
+    val scrollState = rememberScrollState()
+    val isCompact = maxHeight < 700.dp
+
+    Column(
         modifier = Modifier
-            .statusBarsPadding()
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+            .fillMaxSize()
+            .verticalScroll(scrollState)
+            .navigationBarsPadding()
     ) {
-        IconButton(onClick = onMinimizeClick) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_arrow_down),
-                contentDescription = "Back",
-                tint = Color.White,
-                modifier = Modifier.size(27.dp)
-            )
-        }
-        Text(
-            text = "Now Playing",
-            color = Color.White,
-            fontSize = 14.sp,
-            fontFamily = AvenirNext,
-            fontWeight = FontWeight.Medium
+        PlayerHeader(
+            onMinimizeClick = onMinimizeClick,
+            modifier = Modifier.statusBarsPadding()
         )
-        IconButton(onClick = { /* More */ }) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_more),
-                contentDescription = "More",
-                tint = Color.White,
-                modifier = Modifier.size(24.dp)
+
+        PlayerContent(
+            imageBitmap = imageBitmap,
+            currentAudioTitle = currentAudioTitle,
+            currentAudioArtist = currentAudioArtist,
+            isPlaying = isPlaying,
+            currentPosition = currentPosition,
+            duration = duration,
+            imageColors = imageColors,
+            viewModel = viewModel,
+            isCompact = isCompact,
+            maxWidth = maxWidth
+        )
+    }
+}
+
+
+@Composable
+private fun PlayerHeader(
+    onMinimizeClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier,
+        color = Color.Transparent
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(
+                onClick = onMinimizeClick,
+                modifier = Modifier.size(48.dp)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_arrow_down),
+                    contentDescription = "Back",
+                    tint = Color.White,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+
+            Text(
+                text = "Now Playing",
+                color = Color.White,
+                fontSize = 16.sp,
+                fontFamily = AvenirNext,
+                fontWeight = FontWeight.Medium,
+                style = MaterialTheme.typography.titleMedium
             )
+
+            IconButton(
+                onClick = { },
+                modifier = Modifier.size(48.dp)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_more),
+                    contentDescription = "More",
+                    tint = Color.White,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
         }
     }
 }
@@ -198,49 +280,116 @@ private fun PlayerContent(
     currentPosition: Long,
     duration: Long,
     imageColors: ImageColors,
-    viewModel: MusicViewModel
+    viewModel: MusicViewModel,
+    isCompact: Boolean,
+    maxWidth: Dp
 ) {
+    val albumArtSize = when {
+        isCompact -> min(200.dp, maxWidth * 0.5f)
+        else -> min(320.dp, maxWidth * 0.75f)
+    }
+
     Column(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp),
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.spacedBy(
+            if (isCompact) 16.dp else 24.dp
+        )
+    ) {
+        Spacer(modifier = Modifier.height(if (isCompact) 16.dp else 32.dp))
+
+        AlbumArtSection(
+            imageBitmap = imageBitmap,
+            maxSize = albumArtSize
+        )
+
+        PlayerControlsSection(
+            currentAudioTitle = currentAudioTitle,
+            currentAudioArtist = currentAudioArtist,
+            isPlaying = isPlaying,
+            currentPosition = currentPosition,
+            duration = duration,
+            imageColors = imageColors,
+            viewModel = viewModel,
+            isCompact = isCompact
+        )
+
+        Spacer(modifier = Modifier.height(if (isCompact) 16.dp else 32.dp))
+    }
+}
+
+@Composable
+private fun AlbumArtSection(
+    imageBitmap: ImageBitmap?,
+    modifier: Modifier = Modifier,
+    maxSize: Dp = 220.dp
+) {
+    Box(
+        modifier = modifier,
+        contentAlignment = Alignment.Center
     ) {
         if (imageBitmap != null) {
             Image(
                 bitmap = imageBitmap,
-                contentDescription = "Cover",
+                contentDescription = "Album Cover",
+                contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .size(280.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .shadow(20.dp, RoundedCornerShape(12.dp), true)
+                    .size(maxSize)
+                    .aspectRatio(1f)
+                    .clip(RoundedCornerShape(16.dp))
+                    .shadow(
+                        elevation = 24.dp,
+                        shape = RoundedCornerShape(16.dp),
+                        ambientColor = Color.Black.copy(alpha = 0.3f),
+                        spotColor = Color.Black.copy(alpha = 0.3f)
+                    )
             )
+        } else {
+            Surface(
+                modifier = Modifier
+                    .size(maxSize)
+                    .aspectRatio(1f),
+                shape = RoundedCornerShape(16.dp),
+                color = Color.White.copy(alpha = 0.1f)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.default_cover),
+                    contentDescription = "No Cover",
+                    tint = Color.White.copy(alpha = 0.6f),
+                    modifier = Modifier.size(64.dp)
+                )
+            }
         }
+    }
+}
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = currentAudioTitle,
-            color = Color.White,
-            fontSize = 22.sp,
-            fontFamily = AvenirNext,
-            fontWeight = FontWeight.SemiBold,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.fillMaxWidth(),
-            textAlign = TextAlign.Center
+@UnstableApi
+@Composable
+private fun PlayerControlsSection(
+    currentAudioTitle: String,
+    currentAudioArtist: String,
+    isPlaying: Boolean,
+    currentPosition: Long,
+    duration: Long,
+    imageColors: ImageColors,
+    viewModel: MusicViewModel,
+    modifier: Modifier = Modifier,
+    isCompact: Boolean = false
+) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(
+            if (isCompact) 12.dp else 20.dp
         )
-        Text(
-            text = currentAudioArtist,
-            color = Color.White.copy(alpha = 0.7f),
-            fontSize = 16.sp,
-            fontFamily = AvenirNext,
-            modifier = Modifier.fillMaxWidth(),
-            textAlign = TextAlign.Center
+    ) {
+        TrackInfoSection(
+            title = currentAudioTitle,
+            artist = currentAudioArtist,
+            isCompact = isCompact
         )
-
-        Spacer(modifier = Modifier.height(32.dp))
 
         RhythmTimeline(
             modifier = Modifier.fillMaxWidth(),
@@ -249,55 +398,88 @@ private fun PlayerContent(
             onSeek = viewModel::seekTo
         )
 
-
-        Spacer(modifier = Modifier.height(40.dp))
-
-        ControlButtons(
+        MainControlButtons(
             coverPrimary = imageColors.vibrant,
             isPlaying = isPlaying,
-            viewModel = viewModel
+            viewModel = viewModel,
+            isCompact = isCompact
         )
-
-
-        Spacer(modifier = Modifier.height(40.dp))
 
         UtilityButtons(
-            viewModel = viewModel
+            viewModel = viewModel,
+            isCompact = isCompact
         )
+    }
+}
 
-       /* Spacer(modifier = Modifier.height(20.dp))
-
-        LyricsHeaderBar(
-            onShareClick = { Log.d("LyricsHeader", "Share clicked") },
-            onFullScreenClick = { Log.d("LyricsHeader", "Fullscreen toggled") },
+@Composable
+private fun TrackInfoSection(
+    title: String,
+    artist: String,
+    isCompact: Boolean = false
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        Text(
+            text = title,
+            color = Color.White,
+            fontSize = if (isCompact) 18.sp else 24.sp,
+            fontFamily = AvenirNext,
+            fontWeight = FontWeight.SemiBold,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.headlineSmall,
             modifier = Modifier
                 .fillMaxWidth()
-                .background(imageColors.vibrant.copy(alpha = 0.1f), RoundedCornerShape(12.dp))
-                .padding(16.dp)
-        )*/
+                .padding(horizontal = 8.dp)
+        )
+
+        Text(
+            text = artist,
+            color = Color.White.copy(alpha = 0.75f),
+            fontSize = if (isCompact) 14.sp else 16.sp,
+            fontFamily = AvenirNext,
+            fontWeight = FontWeight.Normal,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp)
+        )
     }
 }
 
 @UnstableApi
 @Composable
-private fun ControlButtons(
+private fun MainControlButtons(
     coverPrimary: Color,
     isPlaying: Boolean,
-    viewModel: MusicViewModel
+    viewModel: MusicViewModel,
+    isCompact: Boolean = false
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp),
-        horizontalArrangement = Arrangement.SpaceAround,
+            .widthIn(max = 400.dp),
+        horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(
-            painter = painterResource(id = R.drawable.ic_left),
-            contentDescription = "Previous",
-            tint = Color.White,
-            modifier = Modifier.size(20.dp)
-        )
+        IconButton(
+            onClick = { viewModel.playPrevious() },
+            modifier = Modifier.size(if (isCompact) 44.dp else 48.dp)
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_left),
+                contentDescription = "Previous",
+                tint = Color.White,
+                modifier = Modifier.size(if (isCompact) 20.dp else 24.dp)
+            )
+        }
 
         GestureMusicButton(
             isPlaying = isPlaying,
@@ -320,57 +502,83 @@ private fun ControlButtons(
             }
         )
 
-        Icon(
-            painter = painterResource(id = R.drawable.ic_right),
-            contentDescription = "Next",
-            tint = Color.White,
-            modifier = Modifier.size(20.dp)
-        )
+        IconButton(
+            onClick = { viewModel.playNext() },
+            modifier = Modifier.size(if (isCompact) 44.dp else 48.dp)
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_right),
+                contentDescription = "Next",
+                tint = Color.White,
+                modifier = Modifier.size(if (isCompact) 20.dp else 24.dp)
+            )
+        }
     }
 }
 
 @UnstableApi
 @Composable
-private fun UtilityButtons(viewModel: MusicViewModel) {
+private fun UtilityButtons(
+    viewModel: MusicViewModel,
+    isCompact: Boolean = false
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
+            .widthIn(max = 320.dp),
+        horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        IconButton(onClick = viewModel::toggleShuffle) {
+        IconButton(
+            onClick = viewModel::toggleShuffle,
+            modifier = Modifier.size(if (isCompact) 44.dp else 48.dp)
+        ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_shuffle),
                 contentDescription = "Shuffle",
-                tint = Color.White
+                tint = Color.White.copy(alpha = 0.8f),
+                modifier = Modifier.size(if (isCompact) 20.dp else 22.dp)
             )
         }
-        IconButton(onClick = viewModel::toggleRepeat) {
+
+        IconButton(
+            onClick = viewModel::toggleRepeat,
+            modifier = Modifier.size(if (isCompact) 44.dp else 48.dp)
+        ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_repeat),
                 contentDescription = "Repeat",
-                tint = Color.White
+                tint = Color.White.copy(alpha = 0.8f),
+                modifier = Modifier.size(if (isCompact) 20.dp else 22.dp)
             )
         }
-        IconButton(onClick = { /* Share */ }) {
+
+        IconButton(
+            onClick = { },
+            modifier = Modifier.size(if (isCompact) 44.dp else 48.dp)
+        ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_share),
                 contentDescription = "Share",
-                tint = Color.White
+                tint = Color.White.copy(alpha = 0.8f),
+                modifier = Modifier.size(if (isCompact) 20.dp else 22.dp)
             )
         }
-        IconButton(onClick = { /* Bookmark */ }) {
+
+        IconButton(
+            onClick = { },
+            modifier = Modifier.size(if (isCompact) 44.dp else 48.dp)
+        ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_bookmark),
                 contentDescription = "Bookmark",
-                tint = Color.White
+                tint = Color.White.copy(alpha = 0.8f),
+                modifier = Modifier.size(if (isCompact) 20.dp else 22.dp)
             )
         }
     }
 }
 
-
-@Preview(showBackground = true)
+@Preview(showBackground = true,/* device = "spec:width=360dp,height=640dp"*/)
 @Composable
 fun PlayerScreenPreview() {
     PlayerScreen(
