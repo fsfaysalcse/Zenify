@@ -80,5 +80,8 @@ dependencies {
     //Coil
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
-    implementation("androidx.palette:palette:1.0.0")
+    implementation(libs.androidx.palette)
+
+    //Navigation
+    implementation(libs.androidx.navigation.compose)
 }

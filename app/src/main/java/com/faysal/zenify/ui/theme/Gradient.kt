@@ -2,6 +2,7 @@ package com.faysal.zenify.ui.theme
 
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import com.faysal.zenify.Zenify
 
 val MusicGradient = Brush.verticalGradient(
     colors = listOf(
@@ -11,8 +12,13 @@ val MusicGradient = Brush.verticalGradient(
     )
 )
 
-val TabPrimary =  Color(0xFFC3B8E2) // Neon red, like Blinding Lights tone
+val ZenifyPrimary = Color(0xFF6C4EF5)
+
+val AnimateCircle = Color(0xFF262626) // Neon red, like Blinding Lights tone
+
+val TabPrimary =  Color(0xFF6C4EF5) // Neon red, like Blinding Lights tone
 val MusicPrimaryColor = Color(0xFF5C0029) // Neon red, like Blinding Lights tone
+
 val MusicSecondaryColor = Color(0xFF9B0000) // Dark red/maroon
 val RANDI = Color(0xFF689F38) // Dark red/maroon
 
@@ -79,16 +85,7 @@ val blackToZenMystic = Brush.horizontalGradient(
         Color(0xFF221A4C), // deeper violet
         Color(0xFF2E1E66), // purple depth
         Color(0xFF3A2380), // night blue
-        Color(0xFF462899), // Zen violet
-        Color(0xFF512EB2), // electric lavender
-        Color(0xFF5C33CC), // soft neon purple
-        Color(0xFF6738E5),
-        Color(0xFF774DF0), // core vibe
-        Color(0xFF8861F5),
-        Color(0xFF9B76F7),
-        Color(0xFFAD8BFA),
-        Color(0xFFBF9FFD),
-        Color(0xFFC9AEE8), // shifting to lighter tone
+        Color(0xFF462899), // Zen violet // shifting to lighter tone
     )
 )
 

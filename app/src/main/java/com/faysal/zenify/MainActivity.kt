@@ -1,25 +1,24 @@
 package com.faysal.zenify
 
+import android.Manifest
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import com.faysal.zenify.ui.screen.DashboardScreen
+import androidx.core.content.ContextCompat
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.faysal.zenify.ui.screen.HomeScreen
+import com.faysal.zenify.ui.screen.OnBoardScreen
+import com.faysal.zenify.ui.screen.Screen
+import com.faysal.zenify.ui.screen.SettingsScreen
 import com.faysal.zenify.ui.theme.ZenifyTheme
-import com.faysal.zenify.ui.theme.blackToDreamWave
-import com.faysal.zenify.ui.theme.blackToNeveBlue
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -27,29 +26,42 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         enableEdgeToEdge(
-            statusBarStyle = SystemBarStyle.dark(
-                scrim = Color.Transparent.toArgb()
-            ),
-            navigationBarStyle = SystemBarStyle.dark(
-                scrim = Color.Transparent.toArgb(),
-            )
+            statusBarStyle = SystemBarStyle.dark(Color.Transparent.toArgb()),
+            navigationBarStyle = SystemBarStyle.dark(Color.Transparent.toArgb())
         )
+
+        // Permission check
+        val hasNotificationPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == android.content.pm.PackageManager.PERMISSION_GRANTED
+        } else true
+
+        val hasMusicPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_AUDIO) == android.content.pm.PackageManager.PERMISSION_GRANTED
+        } else {
+            ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == android.content.pm.PackageManager.PERMISSION_GRANTED
+        }
+
+        val startDestination = if (hasNotificationPermission && hasMusicPermission) {
+            Screen.Home.route
+        } else {
+            Screen.OnBoard.route
+        }
 
         setContent {
             ZenifyTheme {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(blackToDreamWave)
-                        .statusBarsPadding()
-                        .navigationBarsPadding()
-                        .background(Color.Transparent),
-                    contentAlignment = Alignment.Center
-                ) {
-                    DashboardScreen()
+                val navController = rememberNavController()
+                NavHost(navController = navController, startDestination = startDestination) {
+                    composable(Screen.OnBoard.route) {
+                        OnBoardScreen(navController)
+                    }
+                    composable(Screen.Home.route) {
+                        HomeScreen(navController)
+                    }
+                    composable(Screen.Settings.route) {
+                        SettingsScreen(navController)
+                    }
                 }
             }
         }
     }
 }
-

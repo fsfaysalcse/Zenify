@@ -1,234 +1,150 @@
 package com.faysal.zenify.ui.screen
 
-import android.graphics.Bitmap
-import androidx.annotation.OptIn
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.calculateTargetValue
+import androidx.compose.animation.rememberSplineBasedDecay
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.media3.common.util.UnstableApi
-import com.faysal.zenify.R
-import com.faysal.zenify.data.service.MusicServiceConnection
-import com.faysal.zenify.domain.repository.FakeAudioRepository
-import com.faysal.zenify.domain.usecases.GetAudiosUseCase
-import com.faysal.zenify.ui.components.CustomTabBar
-import com.faysal.zenify.ui.components.MiniPlayer
-import com.faysal.zenify.ui.components.SearchBar
-import com.faysal.zenify.ui.states.MusicScreen
-import com.faysal.zenify.ui.theme.AvenirNext
-import com.faysal.zenify.ui.theme.ZenifyTheme
-import com.faysal.zenify.ui.theme.blackToNeveBlue
-import com.faysal.zenify.ui.viewModels.MusicViewModel
+import androidx.compose.ui.util.lerp
+import androidx.navigation.NavHostController
+import com.faysal.zenify.ui.components.MusicPlayerHomeBackground
+import com.faysal.zenify.ui.components.NavigationDrawerBackground
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.koinViewModel
+import me.fsfaysalcse.discoverbd.ui.model.DrawerState
 
-@ExperimentalMaterial3Api
-@OptIn(UnstableApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    modifier: Modifier = Modifier,
-    viewModel: MusicViewModel = koinViewModel()
+    navController: NavHostController? = null,
 ) {
-    val pagerState = rememberPagerState(initialPage = 0) { 4 }
-    val coroutineScope = rememberCoroutineScope()
-    val tabs = listOf("Explore","Tracks", "Albums", "Artist", "Folder")
 
-    val isPlaying by viewModel.isPlaying.collectAsState()
-    val currentAudio by viewModel.currentAudio.collectAsState()
+    val scope = rememberCoroutineScope()
+    var drawerState by remember { mutableStateOf(DrawerState.CLOSED) }
 
-    val audios by viewModel.audios.collectAsState()
-    val bitmapCache = remember { mutableStateMapOf<Long, Bitmap?>() }
+    val drawerWidth = 700f
 
-    val bottomSheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true
-    )
+    val translationX = remember { Animatable(0f) }
+    translationX.updateBounds(0f, drawerWidth)
 
-    var showFullScreenPlayer by remember { mutableStateOf(false) }
-
-    val backStack = viewModel.backStack.last()
-
-    // Push correct screen based on current tab
-    LaunchedEffect(pagerState.currentPage) {
-        when (pagerState.currentPage) {
-            0 -> viewModel.resetBackStack(MusicScreen.Overview)
-            1 -> viewModel.resetBackStack(MusicScreen.SongsList)
-            2 -> viewModel.resetBackStack(MusicScreen.AlbumList)
-            3 -> viewModel.resetBackStack(MusicScreen.ArtistList)
-            4 -> viewModel.resetBackStack(MusicScreen.FolderList)
+    val draggableState = rememberDraggableState(onDelta = { dragAmount ->
+        scope.launch {
+            translationX.snapTo(translationX.value + dragAmount)
         }
-    }
+    })
 
-    Box(modifier = modifier.fillMaxSize()) {
-        Column(
+    val decay = rememberSplineBasedDecay<Float>()
+
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+
+
+        NavigationDrawerBackground() {
+            DrawerScreen(
+                modifier = Modifier,
+                isDrawerOpen = drawerState != DrawerState.CLOSED
+            )
+        }
+
+
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = if (currentAudio != null) 88.dp else 0.dp)
-        ) {
-            val hideSearch by animateDpAsState(
-                targetValue = if (backStack.hideHomeScreen()) 0.dp else 130.dp,
-                animationSpec = tween(durationMillis = 200)
-            )
+                .graphicsLayer {
+                    this.translationX = translationX.value
+                    val scale = lerp(1f, 0.8f, translationX.value / drawerWidth)
+                    this.scaleX = scale
+                    this.scaleY = scale
+                    shape = RoundedCornerShape(
+                        size = if (DrawerState.OPEN == drawerState) 16.dp else 0.dp
+                    )
+                    clip = true
+                }
+                .draggable(
+                    state = draggableState,
+                    orientation = Orientation.Horizontal,
+                    onDragStopped = { velocity: Float ->
+                        val decayX = decay.calculateTargetValue(
+                            translationX.value,
+                            velocity
+                        )
+                        scope.launch {
+                            val targetX = if (decayX > drawerWidth * 0.5f) {
+                                drawerWidth
+                            } else {
+                                0f
+                            }
 
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(hideSearch)
-            ) {
-                SearchBar(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
+                            val canReachTargetWithDecay =
+                                (decayX > targetX && targetX == drawerWidth || (decayX < targetX && targetX == 0f))
 
-                CustomTabBar(
-                    tabs = tabs,
-                    selectedTabIndex = pagerState.currentPage,
-                    onTabSelected = { index ->
-                        coroutineScope.launch { pagerState.animateScrollToPage(index) }
+                            if (canReachTargetWithDecay) {
+                                translationX.animateDecay(
+                                    initialVelocity = velocity,
+                                    animationSpec = decay
+                                )
+                            } else {
+                                translationX.animateTo(
+                                    targetValue = targetX,
+                                    initialVelocity = velocity
+                                )
+                            }
+                            drawerState = if (targetX == drawerWidth) {
+                                DrawerState.OPEN
+                            } else {
+                                DrawerState.CLOSED
+                            }
+                        }
+
                     }
                 )
-            }
-
-
-
-            HorizontalPager(
-                state = pagerState,
-                modifier = Modifier.weight(1f)
-            ) { page ->
-                when (page) {
-                    0 -> OverviewScreen(audios, bitmapCache, viewModel)
-                    1 -> SongsScreen(audios, bitmapCache, viewModel)
-                    2 -> AlbumsScreen(audios, bitmapCache, viewModel)
-                    3 -> ArtistsScreen(audios, bitmapCache, viewModel)
-                    4 -> FoldersScreen(audios, bitmapCache, viewModel)
+        ) {
+            MusicPlayerHomeBackground() {
+                Column(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    HomeContent(
+                        drawerState = drawerState,
+                        onNavigationClick = {
+                            scope.launch {
+                                if (drawerState == DrawerState.OPEN) {
+                                    translationX.animateTo(0f)
+                                } else {
+                                    translationX.animateTo(drawerWidth)
+                                }
+                                drawerState = if (drawerState == DrawerState.OPEN) {
+                                    DrawerState.CLOSED
+                                } else {
+                                    DrawerState.OPEN
+                                }
+                            }
+                        }
+                    )
                 }
             }
         }
-
-        // Mini Player - Always visible when currentAudio is not null
-        if (currentAudio != null) {
-            MiniPlayer(
-                isPlaying = isPlaying,
-                currentAudio = currentAudio!!,
-                onPlayPauseClick = {
-                    if (isPlaying) viewModel.playPause()
-                    else viewModel.playAudio(currentAudio!!)
-                },
-                onExpandClick = {
-                    showFullScreenPlayer = true
-                },
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 0.dp)
-            )
-        }
-
-        // Full Screen Bottom Sheet - Only shows when explicitly requested
-        if (showFullScreenPlayer && currentAudio != null) {
-            ModalBottomSheet(
-                onDismissRequest = {
-                    showFullScreenPlayer = false
-                },
-                sheetState = bottomSheetState,
-                containerColor = Color.Black,
-                contentColor = Color.Black,
-                shape = RectangleShape, // full-screen without rounded corners
-                dragHandle = null // no drag handle
-            ) {
-                PlayerScreen(
-                 /*   isPlaying = isPlaying,
-                    currentAudio = currentAudio!!,
-                    onPlayPauseClick = {
-                        if (isPlaying) viewModel.playPause()
-                        else viewModel.playAudio(currentAudio!!)
-                    },*/
-                    onMinimizeClick = {
-                        showFullScreenPlayer = false
-                    },
-                    viewModel = viewModel,
-                )
-            }
-        }
     }
 }
 
 
-@OptIn(UnstableApi::class)
-@Composable
-fun rememberFakeMusicViewModel(): MusicViewModel {
-    val context = LocalContext.current
-
-    // Provide dependencies (FakeAudioRepository, MusicServiceConnection) inside a factory or DI if needed
-    val factory = remember {
-        object : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                val repository = FakeAudioRepository()
-                val serviceConnect = MusicServiceConnection(context)
-                @Suppress("UNCHECKED_CAST")
-                return MusicViewModel(
-                    serviceConnect, GetAudiosUseCase(repository),
-                    SavedStateHandle()
-                ) as T
-            }
-        }
-    }
-
-    val viewModel: MusicViewModel = viewModel(factory = factory)
-
-    LaunchedEffect(Unit) {
-        viewModel.loadAudios()
-    }
-
-    return viewModel
-}
-
-@kotlin.OptIn(ExperimentalMaterial3Api::class)
-@Preview(showBackground = true)
+@Preview
 @Composable
 fun HomeScreenPreview() {
-    ZenifyTheme {
-        HomeScreen(
-            viewModel = rememberFakeMusicViewModel()
-        )
-    }
+    HomeScreen()
 }

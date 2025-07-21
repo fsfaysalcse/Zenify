@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -29,12 +30,14 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.faysal.zenify.R
 import com.faysal.zenify.domain.model.Audio
 import com.faysal.zenify.ui.theme.AvenirNext
 import com.faysal.zenify.ui.theme.blackToZenMystic
 import com.faysal.zenify.ui.util.getEmbeddedCover
+import com.faysal.zenify.ui.util.sampleAudios
 
 @Composable
 fun MiniPlayer(
@@ -59,7 +62,8 @@ fun MiniPlayer(
             modifier = Modifier
                 .background(blackToZenMystic)
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(16.dp)
+                .navigationBarsPadding(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Album Art Placeholder
@@ -129,4 +133,16 @@ fun MiniPlayer(
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun MiniPlayerPreview() {
+
+    MiniPlayer(
+        isPlaying = true,
+        currentAudio = sampleAudios.first(),
+        onPlayPauseClick = {},
+        onExpandClick = {}
+    )
 }
