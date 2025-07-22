@@ -9,6 +9,7 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.faysal.zenify.domain.model.Audio
+import com.faysal.zenify.domain.model.SerializableAudio
 import com.faysal.zenify.ui.util.PLAYLIST_DATASTORE
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -17,16 +18,6 @@ import kotlinx.serialization.json.Json
 
 private val Context.playlistDataStore: DataStore<Preferences> by preferencesDataStore(name = PLAYLIST_DATASTORE)
 
-@Serializable
-data class SerializableAudio(
-    val id: Long,
-    val title: String,
-    val artist: String,
-    val album: String,
-    val uri: String,
-    val duration: Long,
-    val year: String = ""
-)
 
 class PlaylistDataStore(private val context: Context) {
 

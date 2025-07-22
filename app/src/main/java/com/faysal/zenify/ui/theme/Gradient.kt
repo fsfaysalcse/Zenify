@@ -13,6 +13,8 @@ val MusicGradient = Brush.verticalGradient(
 )
 
 val ZenifyPrimary = Color(0xFF6C4EF5)
+val ZenifySecondary = Color(0xFF594C8C)
+val ZenifyTertiary = Color(0xFF3B2A5C)
 
 val AnimateCircle = Color(0xFF6C4EF5) // Neon red, like Blinding Lights tone
 
@@ -81,8 +83,6 @@ val blackToZenMystic = Brush.horizontalGradient(
     colors = listOf(
         Color(0xFF000000), // pure black
         Color(0xFF0A0A1F), // midnight navy
-        Color(0xFF161633), // soft indigo
-        Color(0xFF221A4C), // deeper violet
     )
 )
 

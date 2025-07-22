@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -29,9 +30,9 @@ fun DrawerItem(
 ) {
 
     val selectedColor = if (isSelected) {
-        Color.White
+        MaterialTheme.colorScheme.primary
     } else {
-        Color.White.copy(0.4f)
+        MaterialTheme.colorScheme.onSurface.copy(0.4f)
     }
 
 

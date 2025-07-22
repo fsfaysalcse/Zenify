@@ -27,6 +27,13 @@ android {
                 "proguard-rules.pro"
             )
         }
+
+        applicationVariants.all {
+            outputs.all {
+                val name = "Zenify v${defaultConfig.versionName}"
+                outputFile.name.replace("app-release", name)
+            }
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11

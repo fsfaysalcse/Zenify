@@ -44,7 +44,7 @@ fun GradientVolumeIndicator(
         Icon(
             imageVector = VolumeUp,
             contentDescription = "Volume",
-            tint = Color.White.copy(alpha = 0.7f),
+            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
             modifier = Modifier.size(20.dp)
         )
 
@@ -53,7 +53,7 @@ fun GradientVolumeIndicator(
                 .width(120.dp)
                 .height(4.dp)
                 .background(
-                    color = Color.White.copy(alpha = 0.2f),
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
                     shape = RoundedCornerShape(2.dp)
                 )
         ) {
@@ -75,7 +75,7 @@ fun GradientVolumeIndicator(
 
         Text(
             text = "${(clampedVolume * 100).toInt()}%",
-            color = Color.White.copy(alpha = 0.7f),
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
             fontSize = 14.sp,
             fontFamily = Nunito
         )

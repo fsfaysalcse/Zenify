@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -298,7 +299,7 @@ fun GestureMusicButton(
             Icon(
                 painter = iconPainter,
                 contentDescription = null,
-                tint = Color.White.copy(
+                tint = MaterialTheme.colorScheme.onSurface.copy(
                     alpha = if (gestureIcon != null) gestureIconAlpha else 1f
                 ),
                 modifier = Modifier

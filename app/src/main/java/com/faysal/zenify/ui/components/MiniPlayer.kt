@@ -53,17 +53,16 @@ fun MiniPlayer(
             .fillMaxWidth()
             .clickable { onExpandClick() },
         colors = CardDefaults.cardColors(
-            containerColor = Color.Transparent
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
         ),
         shape = RoundedCornerShape(
             topStart = 20.dp,
             topEnd = 20.dp
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 30.dp)
     ) {
         Row(
             modifier = Modifier
-                .background(blackToZenMystic)
                 .fillMaxWidth()
                 .padding(16.dp)
                 .navigationBarsPadding(),
@@ -92,7 +91,7 @@ fun MiniPlayer(
                 }
             }
 
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.width(16.dp))
 
             // Song Info
             Column(
@@ -101,7 +100,7 @@ fun MiniPlayer(
                 Text(
                     text = currentAudio.title,
                     style = MaterialTheme.typography.titleMedium,
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onBackground,
                     fontFamily = AvenirNext,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -109,7 +108,7 @@ fun MiniPlayer(
                 Text(
                     text = currentAudio.artist,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color.White.copy(alpha = 0.6f),
+                    color =MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
                     maxLines = 1,
                     fontFamily = AvenirNext,
                     overflow = TextOverflow.Ellipsis
@@ -130,7 +129,7 @@ fun MiniPlayer(
                 Icon(
                     painter = painterResource(playerIcon),
                     contentDescription = if (isPlaying) "Pause" else "Play",
-                    tint = Color.White,
+                    tint = MaterialTheme.colorScheme.onBackground,
                     modifier = Modifier.size(34.dp)
                 )
             }

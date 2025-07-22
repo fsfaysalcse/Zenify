@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -69,7 +70,7 @@ fun ZenCircleSeekBar(
     radius: Dp = 100.dp,
     progressColor: Color = Color(0xFF8B5CF6),
     backgroundColor: Color = Color.Gray.copy(alpha = 0.3f),
-    thumbColor: Color = Color.White,
+    thumbColor: Color = MaterialTheme.colorScheme.onSurface,
 ) {
     val density = LocalDensity.current
     val strokePx = with(density) { strokeWidth.toPx() }
@@ -151,13 +152,13 @@ fun ZenCircleSeekBar(
             Text(
                 text = formatTime(currentMs),
                 fontSize = 16.sp,
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontFamily = Nunito
             )
             Text(
                 text = "-${formatTime(remainingMs)}",
                 fontSize = 14.sp,
-                color = Color.White.copy(alpha = 0.6f),
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                 fontFamily = Nunito
             )
         }

@@ -27,12 +27,14 @@ fun DrawerScreen(
     modifier: Modifier = Modifier,
     isDrawerOpen : Boolean = false
 ) {
-
     //Gradient background
+
+    NavigationDrawerBackground() {
     Box(
         modifier = modifier
             .fillMaxSize()
-    ){
+    ) {
+
 
         Column(
             modifier = Modifier
@@ -73,6 +75,7 @@ fun DrawerScreen(
                 }
             }
         }
+    }
     }
 }
 

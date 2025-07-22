@@ -234,7 +234,7 @@ private fun AppHeader() {
             text = "Your personal music sanctuary",
             fontFamily = ProductSans,
             style = MaterialTheme.typography.bodyLarge,
-            color = Color.White.copy(alpha = 0.7f)
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
         )
     }
 }

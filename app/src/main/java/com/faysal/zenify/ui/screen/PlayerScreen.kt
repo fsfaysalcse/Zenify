@@ -8,7 +8,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -67,10 +66,12 @@ import androidx.compose.ui.unit.sp
 import androidx.media3.common.util.UnstableApi
 import com.faysal.zenify.R
 import com.faysal.zenify.ui.components.GestureMusicButton
+import com.faysal.zenify.ui.components.LyricsHeaderBar
 import com.faysal.zenify.ui.components.RhythmTimeline
 import com.faysal.zenify.ui.shaders.MUSIC_SHADER
 import com.faysal.zenify.ui.states.GestureAction
 import com.faysal.zenify.ui.theme.AvenirNext
+import com.faysal.zenify.ui.theme.ZenifyPrimary
 import com.faysal.zenify.ui.util.ImageColors
 import com.faysal.zenify.ui.util.extractColorsFromImage
 import com.faysal.zenify.ui.util.extractColorsFromUri
@@ -352,12 +353,12 @@ private fun AlbumArtSection(
                     .size(maxSize)
                     .aspectRatio(1f),
                 shape = RoundedCornerShape(16.dp),
-                color = Color.White.copy(alpha = 0.1f)
+                color =Color.White.copy(alpha = 0.1f)
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.default_cover),
                     contentDescription = "No Cover",
-                    tint = Color.White.copy(alpha = 0.6f),
+                    tint =Color.White.copy(alpha = 0.6f),
                     modifier = Modifier.size(64.dp)
                 )
             }
@@ -409,6 +410,22 @@ private fun PlayerControlsSection(
             viewModel = viewModel,
             isCompact = isCompact
         )
+
+        LyricsHeaderBar(
+            onShareClick = {},
+            onFullScreenClick = {},
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .background(
+                    color = imageColors.muted.copy(alpha = 0.3f),
+                    shape = RoundedCornerShape(8.dp)
+                )
+                .padding(
+                    horizontal = 16.dp,
+                    vertical = 8.dp
+                )
+        )
     }
 }
 
@@ -439,7 +456,7 @@ private fun TrackInfoSection(
 
         Text(
             text = artist,
-            color = Color.White.copy(alpha = 0.75f),
+            color =Color.White.copy(alpha = 0.75f),
             fontSize = if (isCompact) 14.sp else 16.sp,
             fontFamily = AvenirNext,
             fontWeight = FontWeight.Normal,
@@ -522,6 +539,10 @@ private fun UtilityButtons(
     viewModel: MusicViewModel,
     isCompact: Boolean = false
 ) {
+
+    val isRepeatEnabled by viewModel.isRepeatEnabled.collectAsState()
+    val isShuffleEnabled by viewModel.isShuffleEnabled.collectAsState()
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -535,7 +556,11 @@ private fun UtilityButtons(
             Icon(
                 painter = painterResource(id = R.drawable.ic_shuffle),
                 contentDescription = "Shuffle",
-                tint = Color.White.copy(alpha = 0.8f),
+                tint = if (isShuffleEnabled) {
+                    ZenifyPrimary
+                } else {
+                   Color.White.copy(alpha = 0.8f)
+                },
                 modifier = Modifier.size(if (isCompact) 20.dp else 22.dp)
             )
         }
@@ -547,7 +572,11 @@ private fun UtilityButtons(
             Icon(
                 painter = painterResource(id = R.drawable.ic_repeat),
                 contentDescription = "Repeat",
-                tint = Color.White.copy(alpha = 0.8f),
+                tint = if (isRepeatEnabled) {
+                    ZenifyPrimary
+                } else {
+                   Color.White.copy(alpha = 0.8f)
+                },
                 modifier = Modifier.size(if (isCompact) 20.dp else 22.dp)
             )
         }
@@ -559,7 +588,7 @@ private fun UtilityButtons(
             Icon(
                 painter = painterResource(id = R.drawable.ic_share),
                 contentDescription = "Share",
-                tint = Color.White.copy(alpha = 0.8f),
+                tint =Color.White.copy(alpha = 0.8f),
                 modifier = Modifier.size(if (isCompact) 20.dp else 22.dp)
             )
         }
@@ -571,7 +600,7 @@ private fun UtilityButtons(
             Icon(
                 painter = painterResource(id = R.drawable.ic_bookmark),
                 contentDescription = "Bookmark",
-                tint = Color.White.copy(alpha = 0.8f),
+                tint =Color.White.copy(alpha = 0.8f),
                 modifier = Modifier.size(if (isCompact) 20.dp else 22.dp)
             )
         }

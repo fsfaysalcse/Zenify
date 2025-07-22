@@ -7,7 +7,6 @@ import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -116,10 +115,7 @@ fun HomeScreen(
                 )
         ) {
             MusicPlayerHomeBackground() {
-                Column(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    HomeContent(
+            HomeContent(
                         drawerState = drawerState,
                         onNavigationClick = {
                             scope.launch {
@@ -137,7 +133,7 @@ fun HomeScreen(
                         }
                     )
                 }
-            }
+
         }
     }
 }

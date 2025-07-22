@@ -14,4 +14,5 @@ val appModule = module {
     single { GetAudiosUseCase(get()) }
     single { MediaLibraryCallback() }
     single { MusicServiceConnection(get()) }
+
 }

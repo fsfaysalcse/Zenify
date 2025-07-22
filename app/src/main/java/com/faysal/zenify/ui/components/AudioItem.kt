@@ -1,7 +1,6 @@
 package com.faysal.zenify.ui.components
 
 import android.graphics.Bitmap
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -30,21 +29,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.faysal.zenify.R
 import com.faysal.zenify.domain.model.Audio
 import com.faysal.zenify.ui.theme.AvenirNext
-import com.faysal.zenify.ui.util.formatDuration
 import com.faysal.zenify.ui.util.getEmbeddedCover
-import com.faysal.zenify.ui.util.sampleAudios
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -124,7 +119,7 @@ fun AudioItem(
                 fontWeight = FontWeight.SemiBold,
                 maxLines = 1,
                 fontFamily = AvenirNext,
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onSurface,
                 overflow = TextOverflow.Ellipsis
             )
 
@@ -135,7 +130,7 @@ fun AudioItem(
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Medium,
                 maxLines = 1,
-                color = Color.White.copy(alpha = 0.6f),
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                 fontFamily = AvenirNext,
                 overflow = TextOverflow.Ellipsis
             )
@@ -146,7 +141,7 @@ fun AudioItem(
             Icon(
                 painter = painterResource(id = R.drawable.ic_more),
                 contentDescription = "More options",
-                tint = Color.White.copy(alpha = 0.6f),
+                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                 modifier = Modifier.size(20.dp)
             )
         }

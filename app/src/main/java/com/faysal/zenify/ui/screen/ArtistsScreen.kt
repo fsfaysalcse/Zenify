@@ -90,7 +90,7 @@ fun ArtistsScreen(
                             Text(
                                 text = artist.first,
                                 fontFamily = AvenirNext,
-                                color = Color.White,
+                                color = MaterialTheme.colorScheme.onSurface,
                                 style = MaterialTheme.typography.titleMedium
                             )
 
@@ -104,7 +104,7 @@ fun ArtistsScreen(
                                 fontFamily = AvenirNext,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
-                                color = Color.White.copy(alpha = 0.6f)
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                             )
 
                         }
@@ -113,7 +113,7 @@ fun ArtistsScreen(
                     if (index < audios.lastIndex) {
                         HorizontalDivider(
                             thickness = 0.8.dp,
-                            color = Color.White.copy(alpha = 0.1f)
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
                         )
                     }
                 }

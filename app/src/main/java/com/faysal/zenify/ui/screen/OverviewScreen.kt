@@ -78,7 +78,7 @@ fun OverviewScreen(
                     letterSpacing = 3.sp,
                     fontFamily = NavFont,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = MaterialTheme.colorScheme.onSurface
                 )
 
                 TextButton(
@@ -89,7 +89,7 @@ fun OverviewScreen(
                 ) {
                     Text(
                         text = "View All",
-                        color = Color.White.copy(alpha = 0.8f),
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
                         fontFamily = AvenirNext,
                         fontSize = 14.sp
                     )
@@ -143,7 +143,7 @@ fun OverviewScreen(
                     letterSpacing = 3.sp,
                     fontFamily = NavFont,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = MaterialTheme.colorScheme.onSurface
                 )
 
                 TextButton(
@@ -154,7 +154,7 @@ fun OverviewScreen(
                 ) {
                     Text(
                         text = "View All",
-                        color = Color.White.copy(alpha = 0.8f),
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
                         fontFamily = AvenirNext,
                         fontSize = 14.sp
                     )
@@ -177,7 +177,7 @@ fun OverviewScreen(
 
             HorizontalDivider(
                 thickness = 0.8.dp,
-                color = Color.White.copy(alpha = 0.1f)
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
             )
         }
 

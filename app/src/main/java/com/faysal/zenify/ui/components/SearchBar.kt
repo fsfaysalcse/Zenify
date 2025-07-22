@@ -32,7 +32,7 @@ fun ModernSearchBar(
     onNavigationClick: () -> Unit = {},
     onSearchTextChange: (String) -> Unit = {},
     placeholder: String = "Search...",
-    backgroundColor: Color = Color.White,
+    backgroundColor: Color = MaterialTheme.colorScheme.onSurface,
     contentColor: Color = Color.Black,
     elevation: Int = 4
 ) {
@@ -188,7 +188,7 @@ fun GradientSearchBar(
                             interactionSource = interactionSource,
                             indication = null
                         ) { onNavigationClick() },
-                    color = Color.White.copy(alpha = 0.1f)
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
                 ) {
                     Box(
                         contentAlignment = Alignment.Center
@@ -196,7 +196,7 @@ fun GradientSearchBar(
                         Icon(
                             painter = painterResource(icon),
                             contentDescription = "Navigation",
-                            tint = Color.White,
+                            tint = MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier.size(24.dp)
                         )
                     }
@@ -219,7 +219,7 @@ fun GradientSearchBar(
                 textStyle = androidx.compose.ui.text.TextStyle(
                     fontFamily = AvenirNext,
                     fontSize = 16.sp,
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Medium
                 ),
                 decorationBox = { innerTextField ->
@@ -232,7 +232,7 @@ fun GradientSearchBar(
                                 text = placeholder,
                                 fontFamily = AvenirNext,
                                 fontSize = 16.sp,
-                                color = Color.White.copy(alpha = 0.7f),
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                                 fontWeight = FontWeight.Normal
                             )
                         }
@@ -247,7 +247,7 @@ fun GradientSearchBar(
             Icon(
                 painter = painterResource(id = R.drawable.ic_search),
                 contentDescription = "Search",
-                tint = Color.White.copy(alpha = 0.9f),
+                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f),
                 modifier = Modifier.size(24.dp)
             )
         }

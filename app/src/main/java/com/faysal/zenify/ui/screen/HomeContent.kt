@@ -88,8 +88,8 @@ fun HomeContent(
                             .padding(horizontal = 16.dp, vertical = 8.dp),
                         drawerState = drawerState,
                         onNavigationClick = onNavigationClick,
-                        backgroundColor = Color(0x812D2D2D),
-                        contentColor = Color.White
+                        backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
+                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant
                     )
 
                     ModernCustomTabBar(

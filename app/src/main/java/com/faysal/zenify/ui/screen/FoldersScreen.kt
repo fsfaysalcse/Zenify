@@ -99,7 +99,7 @@ fun FoldersScreen(
                                 Text(
                                     text = folder.first,
                                     fontFamily = AvenirNext,
-                                    color = Color.White,
+                                    color = MaterialTheme.colorScheme.onSurface,
                                     style = MaterialTheme.typography.titleMedium
                                 )
 
@@ -109,7 +109,7 @@ fun FoldersScreen(
                                     fontFamily = AvenirNext,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
-                                    color = Color.White.copy(alpha = 0.6f)
+                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                                 )
                             }
                         }

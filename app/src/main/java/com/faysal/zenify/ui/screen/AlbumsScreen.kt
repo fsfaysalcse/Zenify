@@ -85,7 +85,7 @@ fun AlbumsScreen(
                             Text(
                                 text = album,
                                 fontFamily = AvenirNext,
-                                color = Color.White,
+                                color = MaterialTheme.colorScheme.onSurface,
                                 maxLines = 1,
                                 style = MaterialTheme.typography.titleMedium
                             )
@@ -94,7 +94,7 @@ fun AlbumsScreen(
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontFamily = AvenirNext,
                                 maxLines = 1,
-                                color = Color.White.copy(alpha = 0.6f),
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                                 overflow = TextOverflow.Ellipsis
                             )
                         }
@@ -103,7 +103,7 @@ fun AlbumsScreen(
                     if (index < audios.lastIndex) {
                         HorizontalDivider(
                             thickness = 0.8.dp,
-                            color = Color.White.copy(alpha = 0.1f)
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
                         )
                     }
                 }

@@ -92,12 +92,12 @@ fun FloatingOrbTabBar(
                         modifier = Modifier
                             .size(if (isSelected) 45.dp else 35.dp)
                             .background(
-                                color = if (isSelected) TabPrimary else Color.White.copy(alpha = 0.1f),
+                                color = if (isSelected) TabPrimary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f),
                                 shape = CircleShape
                             )
                             .border(
                                 width = if (isSelected) 2.dp else 1.dp,
-                                color = if (isSelected) Color.White.copy(alpha = 0.3f) else Color.White.copy(alpha = 0.1f),
+                                color = if (isSelected) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f) else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f),
                                 shape = CircleShape
                             )
                     ) {
@@ -105,7 +105,7 @@ fun FloatingOrbTabBar(
                             text = title.first().toString(),
                             fontFamily = AvenirNext,
                             fontWeight = FontWeight.Bold,
-                            color = if (isSelected) Color.White else Color.White.copy(alpha = 0.6f),
+                            color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                             fontSize = if (isSelected) 16.sp else 14.sp
                         )
                     }
@@ -117,7 +117,7 @@ fun FloatingOrbTabBar(
                     text = title,
                     fontFamily = AvenirNext,
                     fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
-                    color = if (isSelected) TabPrimary else Color.White.copy(alpha = 0.5f),
+                    color = if (isSelected) TabPrimary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                     fontSize = 11.sp
                 )
             }
@@ -196,7 +196,7 @@ fun WaveformTabBar(
                             modifier = Modifier
                                 .size(40.dp)
                                 .background(
-                                    color = Color.White.copy(alpha = 0.05f),
+                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f),
                                     shape = RoundedCornerShape(8.dp)
                                 ),
                             contentAlignment = Alignment.Center
@@ -205,7 +205,7 @@ fun WaveformTabBar(
                                 text = title.first().toString(),
                                 fontFamily = AvenirNext,
                                 fontWeight = FontWeight.Medium,
-                                color = Color.White.copy(alpha = 0.4f),
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
                                 fontSize = 16.sp
                             )
                         }
@@ -217,7 +217,7 @@ fun WaveformTabBar(
                         text = title,
                         fontFamily = AvenirNext,
                         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                        color = if (isSelected) TabPrimary else Color.White.copy(alpha = 0.5f),
+                        color = if (isSelected) TabPrimary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                         fontSize = 12.sp
                     )
                 }
@@ -289,8 +289,8 @@ fun RotatingVinylTabBar(
                                         )
                                     } else {
                                         listOf(
-                                            Color.White.copy(alpha = 0.1f),
-                                            Color.White.copy(alpha = 0.05f),
+                                            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f),
+                                            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f),
                                             Color.Transparent
                                         )
                                     }
@@ -299,7 +299,7 @@ fun RotatingVinylTabBar(
                             )
                             .border(
                                 width = 2.dp,
-                                color = if (isSelected) Color.White.copy(alpha = 0.3f) else Color.White.copy(alpha = 0.1f),
+                                color = if (isSelected) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f) else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f),
                                 shape = CircleShape
                             ),
                         contentAlignment = Alignment.Center
@@ -311,9 +311,9 @@ fun RotatingVinylTabBar(
                                     .border(
                                         width = 1.dp,
                                         color = if (isSelected)
-                                            Color.White.copy(alpha = 0.2f - ringIndex * 0.05f)
+                                            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f - ringIndex * 0.05f)
                                         else
-                                            Color.White.copy(alpha = 0.05f),
+                                            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f),
                                         shape = CircleShape
                                     )
                             )
@@ -323,7 +323,7 @@ fun RotatingVinylTabBar(
                             modifier = Modifier
                                 .size(8.dp)
                                 .background(
-                                    color = if (isSelected) Color.White else Color.White.copy(alpha = 0.3f),
+                                    color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
                                     shape = CircleShape
                                 )
                         )
@@ -335,7 +335,7 @@ fun RotatingVinylTabBar(
                 modifier = Modifier
                     .size(20.dp)
                     .background(
-                        color = Color.White.copy(alpha = 0.1f),
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f),
                         shape = CircleShape
                     )
                     .border(
@@ -375,7 +375,7 @@ fun ModernCustomTabBar(
         tabs.forEachIndexed { index, title ->
             val isSelected = index == selectedTabIndex
             val animatedColor by animateColorAsState(
-                targetValue = if (isSelected) TabPrimary else Color.White.copy(alpha = 0.6f),
+                targetValue = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                 animationSpec = tween(300),
                 label = "textColor"
             )

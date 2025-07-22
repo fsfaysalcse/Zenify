@@ -22,6 +22,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -100,9 +101,11 @@ fun CommonSongListScreen(
             Icon(
                 imageVector = Icons.Default.ArrowBack,
                 contentDescription = null,
-                tint = Color.White
+                tint = MaterialTheme.colorScheme.onSurface
             )
         }
+
+        Spacer(modifier = Modifier.height(8.dp))
 
         Box(
             modifier = Modifier
@@ -175,7 +178,7 @@ fun CommonSongListScreen(
                     text = headerInfo.hint,
                     fontSize = 9.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontFamily = AvenirNext,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -184,7 +187,7 @@ fun CommonSongListScreen(
                     text = title,
                     fontSize = 19.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontFamily = AvenirNext,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -197,7 +200,7 @@ fun CommonSongListScreen(
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Medium,
                         fontFamily = AvenirNext,
-                        color = Color.White.copy(alpha = 0.6f)
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                     )
                 )
             }
@@ -245,7 +248,7 @@ fun CommonSongListScreen(
                 if (index < audios.lastIndex) {
                     HorizontalDivider(
                         thickness = 0.8.dp,
-                        color = Color.White.copy(alpha = 0.1f)
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
                     )
                 }
             }

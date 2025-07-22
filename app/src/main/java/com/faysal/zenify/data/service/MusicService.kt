@@ -4,11 +4,11 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.net.Uri
 import android.os.Binder
 import android.os.IBinder
 import android.util.Log
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
@@ -25,20 +25,19 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import java.util.UUID
-import androidx.core.net.toUri
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 
 private const val TAG = "MusicService"
 
 @UnstableApi
-class MusicService : MediaLibraryService() {
+class MusicService() : MediaLibraryService() {
 
     private val binder = MusicBinder()
     private var player: ExoPlayer? = null
@@ -105,6 +104,28 @@ class MusicService : MediaLibraryService() {
             Log.e(TAG, "Failed to initialize MusicService", e)
             stopSelf()
         }
+    }
+
+    private fun initializeMediaSession() {
+        mediaSession = MediaLibrarySession.Builder(this, player!!, mediaLibraryCallback)
+            .setId(UUID.randomUUID().toString())
+            .build()
+    }
+
+    private fun initializeNotificationManager() {
+        notificationManager = MusicNotificationManager(
+            context = this,
+            service = this,
+            onNotificationPosted = { notificationId, notification ->
+                startForeground(notificationId, notification)
+            },
+            onNotificationCancelled = { notificationId, dismissedByUser ->
+                if (dismissedByUser) pauseAudio()
+            }
+        )
+        val manager = notificationManager!!.createNotificationManager()
+        manager.setMediaSessionToken(mediaSession!!.platformToken)
+        manager.setPlayer(player)
     }
 
     private fun registerBroadcastReceiver() {
@@ -189,27 +210,7 @@ class MusicService : MediaLibraryService() {
         }
     }
 
-    private fun initializeMediaSession() {
-        mediaSession = MediaLibrarySession.Builder(this, player!!, mediaLibraryCallback)
-            .setId(UUID.randomUUID().toString())
-            .build()
-    }
 
-    private fun initializeNotificationManager() {
-        notificationManager = MusicNotificationManager(
-            context = this,
-            service = this,
-            onNotificationPosted = { notificationId, notification ->
-                startForeground(notificationId, notification)
-            },
-            onNotificationCancelled = { notificationId, dismissedByUser ->
-                if (dismissedByUser) pauseAudio()
-            }
-        )
-        val manager = notificationManager!!.createNotificationManager()
-        manager.setMediaSessionToken(mediaSession!!.platformToken)
-        manager.setPlayer(player)
-    }
 
     private fun restorePlaybackState() {
         serviceScope.launch {

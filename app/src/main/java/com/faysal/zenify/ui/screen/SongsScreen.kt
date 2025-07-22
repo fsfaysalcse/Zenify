@@ -47,7 +47,7 @@ fun SongsScreen(
                 )
                 HorizontalDivider(
                     thickness = 0.8.dp,
-                    color = Color.White.copy(alpha = 0.1f)
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
                 )
             }
         }

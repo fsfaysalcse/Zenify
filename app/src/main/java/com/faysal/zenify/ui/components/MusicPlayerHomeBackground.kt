@@ -79,9 +79,8 @@ fun MusicPlayerHomeBackground(content: @Composable () -> Unit) {
             .background(
                 Brush.radialGradient(
                     colors = listOf(
-                        Color(0xFF000000),
-                        Color(0xFF0A0A0A),
-                        Color(0xFF050505)
+                        MaterialTheme.colorScheme.surface,
+                        MaterialTheme.colorScheme.surface,
                     ),
                     radius = 1200f
                 )
@@ -136,9 +135,8 @@ fun NavigationDrawerBackground(content: @Composable () -> Unit) {
             .background(
                 Brush.verticalGradient(
                     colors = listOf(
-                        Color(0xFF000000),
-                        Color(0xFF0D0D0D),
-                        Color(0xFF060606)
+                        MaterialTheme.colorScheme.surface,
+                        MaterialTheme.colorScheme.surface,
                     )
                 )
             )
@@ -189,9 +187,9 @@ private fun DrawScope.drawFloatingOrbs(pulseScale: Float, offset: Float) {
     )
 
     val orbColors = listOf(
-        Color(0xFF6366F1).copy(alpha = 0.6f),
-        Color(0xFFEC4899).copy(alpha = 0.5f),
-        Color(0xFF10B981).copy(alpha = 0.4f)
+        Color(0xFF6366F1).copy(alpha = 0.3f),
+        Color(0xFFEC4899).copy(alpha = 0.2f),
+        Color(0xFF10B981).copy(alpha = 0.2f)
     )
 
     orbPositions.forEachIndexed { index, basePosition ->

@@ -36,7 +36,7 @@ fun QuickAccessCard(
         modifier = modifier
             .clickable { onClick() },
         colors = CardDefaults.cardColors(
-            containerColor = Color.White.copy(alpha = 0.05f)
+            containerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f)
         ),
         shape = RoundedCornerShape(12.dp)
     ) {
@@ -49,7 +49,7 @@ fun QuickAccessCard(
             Icon(
                 painter = painterResource(id = icon),
                 contentDescription = title,
-                tint = Color.White,
+                tint = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.size(24.dp)
             )
 
@@ -61,7 +61,7 @@ fun QuickAccessCard(
                     style = MaterialTheme.typography.titleSmall,
                     fontFamily = AvenirNext,
                     fontWeight = FontWeight.SemiBold,
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -70,7 +70,7 @@ fun QuickAccessCard(
                     text = subtitle,
                     style = MaterialTheme.typography.bodySmall,
                     fontFamily = AvenirNext,
-                    color = Color.White.copy(alpha = 0.7f),
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
