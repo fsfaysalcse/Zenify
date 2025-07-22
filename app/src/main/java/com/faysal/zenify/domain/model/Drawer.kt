@@ -17,16 +17,21 @@ val DRAWER_ITEM = listOf(
     ),
     Drawer(
         id = 2,
+        name = "Favorites",
+        icon = R.drawable.ic_bookmark
+    ),
+    Drawer(
+        id = 3,
         name = "Equalizer",
         icon = R.drawable.ic_equalizer
     ),
     Drawer(
-        id = 3,
+        id = 4,
         name = "Settings",
         icon = R.drawable.ic_settings
     ),
     Drawer(
-        id = 4,
+        id = 5,
         name = "About",
         icon = R.drawable.ic_developer
     )
