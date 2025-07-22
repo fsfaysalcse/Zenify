@@ -43,7 +43,7 @@ fun AlbumCard(
     album: AlbumInfo,
     onPlayAlbum: () -> Unit,
     onAlbumClick: () -> Unit,
-    bitmapCache: MutableMap<Long, Bitmap?>,
+    bitmapCache: MutableMap<String, Bitmap?>,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current

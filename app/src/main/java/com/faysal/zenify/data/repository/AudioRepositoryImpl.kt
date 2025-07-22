@@ -52,7 +52,7 @@ class AudioRepositoryImpl(
             val year = cursor.getInt(durationCol)
             val contentUri: Uri =
                 ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
-            list.add(Audio(id, title, artist, album, duration, year.toString(),contentUri))
+            list.add(Audio(id.toString(), title, artist, album, duration, year.toString(),contentUri))
         }
 
         cursor.close()

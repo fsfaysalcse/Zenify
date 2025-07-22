@@ -8,7 +8,12 @@ import androidx.lifecycle.viewModelScope
 import androidx.media3.common.util.UnstableApi
 import com.faysal.zenify.data.service.MusicServiceConnection
 import com.faysal.zenify.domain.model.Audio
+import com.faysal.zenify.domain.usecases.AddToQueueNextUseCase
+import com.faysal.zenify.domain.usecases.AddToQueueUseCase
 import com.faysal.zenify.domain.usecases.GetAudiosUseCase
+import com.faysal.zenify.domain.usecases.IsFavouriteFlowUseCase
+import com.faysal.zenify.domain.usecases.RemoveFromFavouritesUseCase
+import com.faysal.zenify.domain.usecases.ToggleFavouriteUseCase
 import com.faysal.zenify.ui.states.MusicScreen
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,7 +24,12 @@ import kotlinx.coroutines.launch
 class MusicViewModel(
     private val serviceConnection: MusicServiceConnection,
     private val getAudiosUseCase: GetAudiosUseCase,
-    private val savedStateHandle: SavedStateHandle
+    private val savedStateHandle: SavedStateHandle,
+    private val addToQueueUseCase: AddToQueueUseCase,
+    private val addToQueueNextUseCase: AddToQueueNextUseCase,
+    private val toggleFavouriteUseCase: ToggleFavouriteUseCase,
+    private val removeFromFavouritesUseCase: RemoveFromFavouritesUseCase,
+    private val isFavouriteFlowUseCase: IsFavouriteFlowUseCase
 ) : ViewModel() {
 
     private val _audios = MutableStateFlow<List<Audio>>(emptyList())
@@ -186,6 +196,40 @@ class MusicViewModel(
 
     fun seekTo(position: Long) {
         serviceConnection.seekTo(position)
+    }
+
+    fun addToQueue(audio: Audio) {
+        viewModelScope.launch {
+            addToQueueUseCase(audio)
+        }
+    }
+
+    fun addToQueueNext(audio: Audio) {
+        viewModelScope.launch {
+            val currentIndex = getCurrentAudioIndex()
+            addToQueueNextUseCase(audio, currentIndex)
+        }
+    }
+
+    fun toggleFavourite(audio: Audio) {
+        viewModelScope.launch {
+            toggleFavouriteUseCase(audio)
+        }
+    }
+
+
+    fun removeFromFavourites(audioId: String) {
+        viewModelScope.launch {
+            removeFromFavouritesUseCase(audioId)
+        }
+    }
+
+
+    fun isFavourite(audioId: String) = isFavouriteFlowUseCase(audioId)
+
+    private fun getCurrentAudioIndex(): Int {
+        val currentAudio = _currentAudio.value ?: return -1
+        return _playlist.value.indexOfFirst { it.id == currentAudio.id }
     }
 
     override fun onCleared() {

@@ -25,7 +25,7 @@ const val PLAYLIST_DATASTORE = "playlist_data"
 
 val sampleAudios = listOf(
     Audio(
-        id = 1L,
+        id = "1L",
         title = "Blinding Lights",
         artist = "The Weeknd",
         album = "After Hours",
@@ -34,7 +34,7 @@ val sampleAudios = listOf(
         uri = "content://media/external/audio/media/1".toUri()
     ),
     Audio(
-        id = 2L,
+        id = "2L",
         title = "Shape of You",
         artist = "Ed Sheeran",
         album = "Divide",
@@ -43,7 +43,7 @@ val sampleAudios = listOf(
         uri = "content://media/external/audio/media/2".toUri()
     ),
     Audio(
-        id = 3L,
+        id = "3L",
         title = "Someone Like You",
         artist = "Adele",
         album = "21",
@@ -52,7 +52,7 @@ val sampleAudios = listOf(
         uri = "content://media/external/audio/media/3".toUri()
     ),
     Audio(
-        id = 4L,
+        id = "4L",
         title = "Perfect",
         artist = "Ed Sheeran",
         album = "Divide",
@@ -61,7 +61,7 @@ val sampleAudios = listOf(
         uri = "content://media/external/audio/media/4".toUri()
     ),
     Audio(
-        id = 5L,
+        id = "5L",
         title = "Starboy",
         artist = "The Weeknd",
         album = "Starboy",
@@ -70,7 +70,7 @@ val sampleAudios = listOf(
         uri = "content://media/external/audio/media/5".toUri()
     ),
     Audio(
-        id = 6L,
+        id = "6L",
         title = "Rolling in the Deep",
         artist = "Adele",
         album = "21",
@@ -79,7 +79,7 @@ val sampleAudios = listOf(
         uri = "content://media/external/audio/media/6".toUri()
     ),
     Audio(
-        id = 7L,
+        id = "7L",
         title = "Levitating",
         artist = "Dua Lipa",
         album = "Future Nostalgia",
@@ -88,7 +88,7 @@ val sampleAudios = listOf(
         uri = "content://media/external/audio/media/7".toUri()
     ),
     Audio(
-        id = 8L,
+        id = "8L",
         title = "Bad Habits",
         artist = "Ed Sheeran",
         album = "=",

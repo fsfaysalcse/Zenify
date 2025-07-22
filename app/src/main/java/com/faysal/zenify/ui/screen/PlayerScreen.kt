@@ -57,14 +57,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.media3.common.util.UnstableApi
 import com.faysal.zenify.R
+import com.faysal.zenify.ui.components.AIMusicPlayerBackground
 import com.faysal.zenify.ui.components.GestureMusicButton
 import com.faysal.zenify.ui.components.LyricsHeaderBar
 import com.faysal.zenify.ui.components.RhythmTimeline
+import com.faysal.zenify.ui.mock.rememberFakeMusicViewModel
 import com.faysal.zenify.ui.shaders.MUSIC_SHADER
 import com.faysal.zenify.ui.states.GestureAction
 import com.faysal.zenify.ui.theme.AvenirNext
@@ -102,31 +105,36 @@ fun PlayerScreen(
             else -> ImageColors()
         }
     }
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black)
-            .onSizeChanged { screenSize = it }
+    AIMusicPlayerBackground(
+        primaryColor = imageColors.vibrant,
+        secondaryColor = imageColors.dominant,
+        accentColor = imageColors.muted
     ) {
-        BackgroundShader(imageColors)
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black)
+                .onSizeChanged { screenSize = it }
+        ) {
 
-        val availableHeight = with(density) { screenSize.height.toDp() }
-        val availableWidth = with(density) { screenSize.width.toDp() }
+            val availableHeight = with(density) { screenSize.height.toDp() }
+            val availableWidth = with(density) { screenSize.width.toDp() }
 
-        PlayerLayout(
-            onMinimizeClick = onMinimizeClick,
-            imageBitmap = imageBitmap,
-            currentAudioTitle = currentAudio?.title ?: "Unknown",
-            currentAudioArtist = currentAudio?.artist ?: "Unknown",
-            isPlaying = isPlaying,
-            currentPosition = currentPosition,
-            duration = duration,
-            imageColors = imageColors,
-            viewModel = viewModel,
-            availableHeight = availableHeight,
-            availableWidth = availableWidth
-        )
+            PlayerLayout(
+                onMinimizeClick = onMinimizeClick,
+                imageBitmap = imageBitmap,
+                currentAudioId = currentAudio?.id ?: "",
+                currentAudioTitle = currentAudio?.title ?: "Unknown",
+                currentAudioArtist = currentAudio?.artist ?: "Unknown",
+                isPlaying = isPlaying,
+                currentPosition = currentPosition,
+                duration = duration,
+                imageColors = imageColors,
+                viewModel = viewModel,
+                availableHeight = availableHeight,
+                availableWidth = availableWidth
+            )
+        }
     }
 }
 
@@ -183,8 +191,9 @@ private fun PlayerLayout(
     duration: Long,
     imageColors: ImageColors,
     viewModel: MusicViewModel,
-    availableHeight: androidx.compose.ui.unit.Dp,
-    availableWidth: androidx.compose.ui.unit.Dp
+    availableHeight: Dp,
+    availableWidth: Dp,
+    currentAudioId: String
 ) {
     val headerHeight = 64.dp
     val contentHeight = availableHeight - headerHeight
@@ -202,6 +211,7 @@ private fun PlayerLayout(
 
         PlayerContent(
             imageBitmap = imageBitmap,
+            currentAudioId = currentAudioId,
             currentAudioTitle = currentAudioTitle,
             currentAudioArtist = currentAudioArtist,
             isPlaying = isPlaying,
@@ -278,8 +288,9 @@ private fun PlayerContent(
     duration: Long,
     imageColors: ImageColors,
     viewModel: MusicViewModel,
-    albumArtSize: androidx.compose.ui.unit.Dp,
-    modifier: Modifier = Modifier
+    albumArtSize: Dp,
+    modifier: Modifier = Modifier,
+    currentAudioId: String
 ) {
     Column(
         modifier = modifier
@@ -494,10 +505,13 @@ private fun MainControlButtons(
 private fun UtilityButtons(
     viewModel: MusicViewModel,
     imageColors: ImageColors = ImageColors(),
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
+    val currentAudio = viewModel.currentAudio.collectAsState().value
     val isRepeatEnabled by viewModel.isRepeatEnabled.collectAsState()
     val isShuffleEnabled by viewModel.isShuffleEnabled.collectAsState()
+
+    val isFavourite by viewModel.isFavourite(currentAudio?.id ?: "").collectAsState(initial = false)
 
     Row(
         modifier = modifier
@@ -565,7 +579,17 @@ private fun UtilityButtons(
         }
 
         IconButton(
-            onClick = { },
+            onClick = {
+                if (isFavourite) {
+                    currentAudio?.let {
+                        viewModel.removeFromFavourites(it.id)
+                    }
+                } else {
+                    currentAudio?.let {
+                        viewModel.toggleFavourite(it)
+                    }
+                }
+            },
             modifier = Modifier
                 .size(48.dp)
                 .background(
@@ -576,7 +600,11 @@ private fun UtilityButtons(
             Icon(
                 painter = painterResource(id = R.drawable.ic_bookmark),
                 contentDescription = "Bookmark",
-                tint = Color.White.copy(alpha = 0.8f),
+                tint = if (isFavourite) {
+                    ZenifyPrimary
+                } else {
+                    Color.White.copy(alpha = 0.8f)
+                },
                 modifier = Modifier.size(22.dp)
             )
         }

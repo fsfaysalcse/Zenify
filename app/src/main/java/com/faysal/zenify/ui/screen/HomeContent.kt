@@ -1,39 +1,41 @@
 package com.faysal.zenify.ui.screen
 
-import android.app.Activity
-import android.content.Context
-import android.content.ContextWrapper
 import android.graphics.Bitmap
-import android.os.Build
 import androidx.annotation.OptIn
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material3.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ModalBottomSheetProperties
-import androidx.compose.runtime.*
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.SecureFlagPolicy
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.media3.common.util.UnstableApi
-import com.faysal.zenify.data.service.MusicServiceConnection
-import com.faysal.zenify.domain.repository.FakeAudioRepository
-import com.faysal.zenify.domain.usecases.GetAudiosUseCase
-import com.faysal.zenify.ui.components.*
+import com.faysal.zenify.ui.components.MiniPlayer
+import com.faysal.zenify.ui.components.ModernCustomTabBar
+import com.faysal.zenify.ui.components.ModernSearchBar
+import com.faysal.zenify.ui.mock.rememberFakeMusicViewModel
 import com.faysal.zenify.ui.states.MusicScreen
-import com.faysal.zenify.ui.theme.ZenifyPrimary
 import com.faysal.zenify.ui.viewModels.MusicViewModel
 import kotlinx.coroutines.launch
 import me.fsfaysalcse.discoverbd.ui.model.DrawerState
@@ -54,7 +56,7 @@ fun HomeContent(
     val isPlaying by viewModel.isPlaying.collectAsState()
     val currentAudio by viewModel.currentAudio.collectAsState()
     val audios by viewModel.audios.collectAsState()
-    val bitmapCache = remember { mutableStateMapOf<Long, Bitmap?>() }
+    val bitmapCache = remember { mutableStateMapOf<String, Bitmap?>() }
 
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showFullScreenPlayer by remember { mutableStateOf(false) }
@@ -157,34 +159,6 @@ fun HomeContent(
             }
         }
     }
-}
-
-@OptIn(UnstableApi::class)
-@Composable
-fun rememberFakeMusicViewModel(): MusicViewModel {
-    val context = LocalContext.current
-    val factory = remember {
-        object : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                val repository = FakeAudioRepository()
-                val serviceConnect = MusicServiceConnection(context)
-                @Suppress("UNCHECKED_CAST")
-                return MusicViewModel(
-                    serviceConnect,
-                    GetAudiosUseCase(repository),
-                    SavedStateHandle()
-                ) as T
-            }
-        }
-    }
-
-    val viewModel: MusicViewModel = viewModel(factory = factory)
-
-    LaunchedEffect(Unit) {
-        viewModel.loadAudios()
-    }
-
-    return viewModel
 }
 
 @ExperimentalMaterial3Api

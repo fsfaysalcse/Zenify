@@ -46,7 +46,7 @@ import kotlinx.coroutines.withContext
 @Composable
 fun AudioItem(
     audio: Audio,
-    bitmapCache: MutableMap<Long, Bitmap?>,
+    bitmapCache: MutableMap<String, Bitmap?>,
     onClick: () -> Unit
 ) {
     val context = LocalContext.current

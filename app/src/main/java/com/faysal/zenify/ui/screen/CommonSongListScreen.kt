@@ -68,7 +68,7 @@ fun CommonSongListScreen(
     uiTypes: UiTypes = UiTypes.Album,
     onPlayAll: (List<Audio>) -> Unit,
     onPlaySong: (Audio) -> Unit,
-    bitmapCache: MutableMap<Long, Bitmap?>
+    bitmapCache: MutableMap<String, Bitmap?>
 ) {
     val context = LocalContext.current
     val firstItem = audios.firstOrNull()

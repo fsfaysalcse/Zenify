@@ -1,7 +1,6 @@
 package com.faysal.zenify.ui.screen
 
 import android.graphics.Bitmap
-import androidx.annotation.OptIn
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -11,20 +10,17 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.util.UnstableApi
 import com.faysal.zenify.domain.model.Audio
 import com.faysal.zenify.ui.components.AudioItem
-import com.faysal.zenify.ui.util.sampleAudios
 import com.faysal.zenify.ui.viewModels.MusicViewModel
 
 @UnstableApi
 @Composable
 fun SongsScreen(
     audios: List<Audio>,
-    bitmapCache: MutableMap<Long, Bitmap?>,
+    bitmapCache: MutableMap<String, Bitmap?>,
     viewModel: MusicViewModel
 ) {
     Column(

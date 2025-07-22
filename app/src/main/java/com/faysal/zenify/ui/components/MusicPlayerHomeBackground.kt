@@ -27,7 +27,6 @@ import androidx.compose.ui.unit.dp
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
-import kotlin.math.sqrt
 
 @Composable
 fun MusicPlayerHomeBackground(content: @Composable () -> Unit) {
@@ -397,6 +396,7 @@ private fun createMusicNotePath(center: Offset, size: Float): Path {
         )
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable

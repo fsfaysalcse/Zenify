@@ -19,7 +19,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,6 +27,7 @@ import androidx.media3.common.util.UnstableApi
 import com.faysal.zenify.R
 import com.faysal.zenify.domain.model.Audio
 import com.faysal.zenify.domain.model.UiTypes
+import com.faysal.zenify.ui.mock.rememberFakeMusicViewModel
 import com.faysal.zenify.ui.states.MusicScreen
 import com.faysal.zenify.ui.theme.AvenirNext
 import com.faysal.zenify.ui.util.sampleAudios
@@ -37,7 +37,7 @@ import com.faysal.zenify.ui.viewModels.MusicViewModel
 @Composable
 fun AlbumsScreen(
     audios: List<Audio>,
-    bitmapCache: MutableMap<Long, Bitmap?>,
+    bitmapCache: MutableMap<String, Bitmap?>,
     viewModel: MusicViewModel
 ) {
 

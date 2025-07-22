@@ -447,7 +447,7 @@ class MusicService() : MediaLibraryService() {
 
                     if (uri != null) {
                         val audio = Audio(
-                            id = System.currentTimeMillis(),
+                            id = System.currentTimeMillis().toString(),
                             title = title ?: "Unknown",
                             artist = artist ?: "Unknown",
                             album = "",

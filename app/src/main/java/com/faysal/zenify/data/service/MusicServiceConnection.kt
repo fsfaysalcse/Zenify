@@ -8,9 +8,9 @@ import android.os.IBinder
 import android.util.Log
 import androidx.media3.common.util.UnstableApi
 import com.faysal.zenify.domain.model.Audio
+import com.faysal.zenify.domain.usecases.AddToQueueUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -18,11 +18,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 @UnstableApi
 class MusicServiceConnection(
     private val context: Context,
-    private val scope: CoroutineScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+    private val scope: CoroutineScope = CoroutineScope(Dispatchers.Main + SupervisorJob()),
+    private val addToQueueUseCase: AddToQueueUseCase? = null
 ) : ServiceConnection {
 
     private val _musicService = MutableStateFlow<MusicService?>(null)
@@ -42,7 +44,6 @@ class MusicServiceConnection(
     val currentPositionFlow: StateFlow<Long> = _musicService.flatMapLatest { service ->
         service?.currentPositionFlow ?: MutableStateFlow(0L)
     }.stateIn(scope, SharingStarted.WhileSubscribed(5000), 0L)
-
 
     val durationFlow: StateFlow<Long> = _musicService.flatMapLatest { service ->
         service?.durationFlow ?: MutableStateFlow(0L)
@@ -65,12 +66,26 @@ class MusicServiceConnection(
         _musicService.value = binder?.getService()
         _isConnected.value = true
         Log.d("MusicServiceConnection", "Service connected")
+
+        observePlaylistChanges()
     }
 
     override fun onServiceDisconnected(name: ComponentName?) {
         _musicService.value = null
         _isConnected.value = false
         Log.d("MusicServiceConnection", "Service disconnected")
+    }
+
+    private fun observePlaylistChanges() {
+        scope.launch {
+            playlistFlow.collect { playlist ->
+                addToQueueUseCase?.let { useCase ->
+                    playlist.forEach { audio ->
+                        useCase(audio)
+                    }
+                }
+            }
+        }
     }
 
     fun bindService() {

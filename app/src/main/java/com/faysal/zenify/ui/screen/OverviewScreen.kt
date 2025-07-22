@@ -19,9 +19,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.media3.common.util.UnstableApi
@@ -31,14 +29,13 @@ import com.faysal.zenify.ui.components.AlbumCard
 import com.faysal.zenify.ui.components.AudioItem
 import com.faysal.zenify.ui.theme.AvenirNext
 import com.faysal.zenify.ui.theme.NavFont
-import com.faysal.zenify.ui.util.sampleAudios
 import com.faysal.zenify.ui.viewModels.MusicViewModel
 
 @UnstableApi
 @Composable
 fun OverviewScreen(
     audios: List<Audio>,
-    bitmapCache: MutableMap<Long, Bitmap?>,
+    bitmapCache: MutableMap<String, Bitmap?>,
     viewModel: MusicViewModel
 ) {
     // Get unique albums and their info

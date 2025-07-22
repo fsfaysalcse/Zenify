@@ -66,7 +66,7 @@ class PlaylistDataStore(private val context: Context) {
 
     private fun Audio.toSerializableAudio(): SerializableAudio {
         return SerializableAudio(
-            id = id,
+            id = id.toLong(),
             title = title,
             artist = artist,
             album = album,
@@ -77,7 +77,7 @@ class PlaylistDataStore(private val context: Context) {
 
     private fun SerializableAudio.toAudio(): Audio {
         return Audio(
-            id = id,
+            id = id.toString(),
             title = title,
             artist = artist,
             album = album,
