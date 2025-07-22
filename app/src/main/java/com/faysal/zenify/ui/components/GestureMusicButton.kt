@@ -299,7 +299,7 @@ fun GestureMusicButton(
             Icon(
                 painter = iconPainter,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurface.copy(
+                tint = Color.White.copy(
                     alpha = if (gestureIcon != null) gestureIconAlpha else 1f
                 ),
                 modifier = Modifier

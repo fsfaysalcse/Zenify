@@ -20,9 +20,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -58,10 +57,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
 import androidx.media3.common.util.UnstableApi
 import com.faysal.zenify.R
@@ -84,8 +81,8 @@ fun PlayerScreen(
     onMinimizeClick: () -> Unit,
     viewModel: MusicViewModel
 ) {
-
     val context = LocalContext.current
+    val density = LocalDensity.current
 
     val isPlaying by viewModel.isPlaying.collectAsState()
     val currentAudio by viewModel.currentAudio.collectAsState()
@@ -97,7 +94,6 @@ fun PlayerScreen(
 
     var imageColors by remember { mutableStateOf(ImageColors()) }
     var screenSize by remember { mutableStateOf(IntSize.Zero) }
-    val density = LocalDensity.current
 
     LaunchedEffect(imageBitmap, currentAudio?.uri) {
         imageColors = when {
@@ -106,18 +102,19 @@ fun PlayerScreen(
             else -> ImageColors()
         }
     }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black)
             .onSizeChanged { screenSize = it }
     ) {
-        val width = with(density) { screenSize.width.toDp() }
-        val height = with(density) { screenSize.height.toDp() }
-
         BackgroundShader(imageColors)
 
-        PortraitPlayerLayout(
+        val availableHeight = with(density) { screenSize.height.toDp() }
+        val availableWidth = with(density) { screenSize.width.toDp() }
+
+        PlayerLayout(
             onMinimizeClick = onMinimizeClick,
             imageBitmap = imageBitmap,
             currentAudioTitle = currentAudio?.title ?: "Unknown",
@@ -127,8 +124,8 @@ fun PlayerScreen(
             duration = duration,
             imageColors = imageColors,
             viewModel = viewModel,
-            maxWidth = width,
-            maxHeight = height
+            availableHeight = availableHeight,
+            availableWidth = availableWidth
         )
     }
 }
@@ -176,7 +173,7 @@ private fun BackgroundShader(imageColors: ImageColors) {
 
 @UnstableApi
 @Composable
-private fun PortraitPlayerLayout(
+private fun PlayerLayout(
     onMinimizeClick: () -> Unit,
     imageBitmap: ImageBitmap?,
     currentAudioTitle: String,
@@ -186,16 +183,16 @@ private fun PortraitPlayerLayout(
     duration: Long,
     imageColors: ImageColors,
     viewModel: MusicViewModel,
-    maxWidth: Dp,
-    maxHeight: Dp
+    availableHeight: androidx.compose.ui.unit.Dp,
+    availableWidth: androidx.compose.ui.unit.Dp
 ) {
-    val scrollState = rememberScrollState()
-    val isCompact = maxHeight < 700.dp
+    val headerHeight = 64.dp
+    val contentHeight = availableHeight - headerHeight
+    val albumArtSize = kotlin.math.min(contentHeight.value * 0.4f, availableWidth.value * 0.75f).dp
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(scrollState)
             .navigationBarsPadding()
     ) {
         PlayerHeader(
@@ -212,12 +209,11 @@ private fun PortraitPlayerLayout(
             duration = duration,
             imageColors = imageColors,
             viewModel = viewModel,
-            isCompact = isCompact,
-            maxWidth = maxWidth
+            albumArtSize = albumArtSize,
+            modifier = Modifier.weight(1f)
         )
     }
 }
-
 
 @Composable
 private fun PlayerHeader(
@@ -225,7 +221,7 @@ private fun PlayerHeader(
     modifier: Modifier = Modifier
 ) {
     Surface(
-        modifier = modifier,
+        modifier = modifier.height(64.dp),
         color = Color.Transparent
     ) {
         Row(
@@ -282,50 +278,72 @@ private fun PlayerContent(
     duration: Long,
     imageColors: ImageColors,
     viewModel: MusicViewModel,
-    isCompact: Boolean,
-    maxWidth: Dp
+    albumArtSize: androidx.compose.ui.unit.Dp,
+    modifier: Modifier = Modifier
 ) {
-    val albumArtSize = when {
-        isCompact -> min(200.dp, maxWidth * 0.5f)
-        else -> min(320.dp, maxWidth * 0.75f)
-    }
-
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp),
+            .padding(horizontal = 20.dp, vertical = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(
-            if (isCompact) 16.dp else 24.dp
-        )
+        verticalArrangement = Arrangement.SpaceEvenly
     ) {
-        Spacer(modifier = Modifier.height(if (isCompact) 16.dp else 32.dp))
-
         AlbumArtSection(
             imageBitmap = imageBitmap,
-            maxSize = albumArtSize
+            size = albumArtSize
         )
 
-        PlayerControlsSection(
-            currentAudioTitle = currentAudioTitle,
-            currentAudioArtist = currentAudioArtist,
-            isPlaying = isPlaying,
-            currentPosition = currentPosition,
-            duration = duration,
-            imageColors = imageColors,
-            viewModel = viewModel,
-            isCompact = isCompact
+        TrackInfoSection(
+            title = currentAudioTitle,
+            artist = currentAudioArtist
         )
 
-        Spacer(modifier = Modifier.height(if (isCompact) 16.dp else 32.dp))
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            RhythmTimeline(
+                modifier = Modifier.fillMaxWidth(),
+                currentPositionMs = currentPosition,
+                durationMs = duration,
+                onSeek = viewModel::seekTo
+            )
+
+            MainControlButtons(
+                coverPrimary = imageColors.vibrant,
+                isPlaying = isPlaying,
+                viewModel = viewModel
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            UtilityButtons(
+                viewModel = viewModel,
+                imageColors = imageColors
+            )
+        }
+
+        LyricsHeaderBar(
+            onShareClick = {},
+            onFullScreenClick = {},
+            modifier = Modifier
+                .padding(top = 10.dp)
+                .padding(horizontal = 10.dp)
+                .fillMaxWidth()
+                .background(
+                    color = Color.Transparent,
+                    shape = RoundedCornerShape(8.dp)
+                )
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+        )
     }
 }
 
 @Composable
 private fun AlbumArtSection(
     imageBitmap: ImageBitmap?,
-    modifier: Modifier = Modifier,
-    maxSize: Dp = 220.dp
+    size: androidx.compose.ui.unit.Dp,
+    modifier: Modifier = Modifier
 ) {
     Box(
         modifier = modifier,
@@ -337,11 +355,11 @@ private fun AlbumArtSection(
                 contentDescription = "Album Cover",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .size(maxSize)
+                    .size(size)
                     .aspectRatio(1f)
                     .clip(RoundedCornerShape(16.dp))
                     .shadow(
-                        elevation = 24.dp,
+                        elevation = 16.dp,
                         shape = RoundedCornerShape(16.dp),
                         ambientColor = Color.Black.copy(alpha = 0.3f),
                         spotColor = Color.Black.copy(alpha = 0.3f)
@@ -350,82 +368,19 @@ private fun AlbumArtSection(
         } else {
             Surface(
                 modifier = Modifier
-                    .size(maxSize)
+                    .size(size)
                     .aspectRatio(1f),
                 shape = RoundedCornerShape(16.dp),
-                color =Color.White.copy(alpha = 0.1f)
+                color = Color.White.copy(alpha = 0.1f)
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.default_cover),
                     contentDescription = "No Cover",
-                    tint =Color.White.copy(alpha = 0.6f),
-                    modifier = Modifier.size(64.dp)
+                    tint = Color.White.copy(alpha = 0.6f),
+                    modifier = Modifier.size(48.dp)
                 )
             }
         }
-    }
-}
-
-@UnstableApi
-@Composable
-private fun PlayerControlsSection(
-    currentAudioTitle: String,
-    currentAudioArtist: String,
-    isPlaying: Boolean,
-    currentPosition: Long,
-    duration: Long,
-    imageColors: ImageColors,
-    viewModel: MusicViewModel,
-    modifier: Modifier = Modifier,
-    isCompact: Boolean = false
-) {
-    Column(
-        modifier = modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(
-            if (isCompact) 12.dp else 20.dp
-        )
-    ) {
-        TrackInfoSection(
-            title = currentAudioTitle,
-            artist = currentAudioArtist,
-            isCompact = isCompact
-        )
-
-        RhythmTimeline(
-            modifier = Modifier.fillMaxWidth(),
-            currentPositionMs = currentPosition,
-            durationMs = duration,
-            onSeek = viewModel::seekTo
-        )
-
-        MainControlButtons(
-            coverPrimary = imageColors.vibrant,
-            isPlaying = isPlaying,
-            viewModel = viewModel,
-            isCompact = isCompact
-        )
-
-        UtilityButtons(
-            viewModel = viewModel,
-            isCompact = isCompact
-        )
-
-        LyricsHeaderBar(
-            onShareClick = {},
-            onFullScreenClick = {},
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .background(
-                    color = imageColors.muted.copy(alpha = 0.3f),
-                    shape = RoundedCornerShape(8.dp)
-                )
-                .padding(
-                    horizontal = 16.dp,
-                    vertical = 8.dp
-                )
-        )
     }
 }
 
@@ -433,16 +388,17 @@ private fun PlayerControlsSection(
 private fun TrackInfoSection(
     title: String,
     artist: String,
-    isCompact: Boolean = false
+    modifier: Modifier = Modifier
 ) {
     Column(
+        modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         Text(
             text = title,
             color = Color.White,
-            fontSize = if (isCompact) 18.sp else 24.sp,
+            fontSize = 22.sp,
             fontFamily = AvenirNext,
             fontWeight = FontWeight.SemiBold,
             maxLines = 2,
@@ -456,8 +412,8 @@ private fun TrackInfoSection(
 
         Text(
             text = artist,
-            color =Color.White.copy(alpha = 0.75f),
-            fontSize = if (isCompact) 14.sp else 16.sp,
+            color = Color.White.copy(alpha = 0.75f),
+            fontSize = 16.sp,
             fontFamily = AvenirNext,
             fontWeight = FontWeight.Normal,
             maxLines = 1,
@@ -477,24 +433,24 @@ private fun MainControlButtons(
     coverPrimary: Color,
     isPlaying: Boolean,
     viewModel: MusicViewModel,
-    isCompact: Boolean = false
+    modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
-            .widthIn(max = 400.dp),
+            .widthIn(max = 320.dp),
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(
             onClick = { viewModel.playPrevious() },
-            modifier = Modifier.size(if (isCompact) 44.dp else 48.dp)
+            modifier = Modifier.size(48.dp)
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_left),
                 contentDescription = "Previous",
                 tint = Color.White,
-                modifier = Modifier.size(if (isCompact) 20.dp else 24.dp)
+                modifier = Modifier.size(24.dp)
             )
         }
 
@@ -521,13 +477,13 @@ private fun MainControlButtons(
 
         IconButton(
             onClick = { viewModel.playNext() },
-            modifier = Modifier.size(if (isCompact) 44.dp else 48.dp)
+            modifier = Modifier.size(48.dp)
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_right),
                 contentDescription = "Next",
                 tint = Color.White,
-                modifier = Modifier.size(if (isCompact) 20.dp else 24.dp)
+                modifier = Modifier.size(24.dp)
             )
         }
     }
@@ -537,21 +493,26 @@ private fun MainControlButtons(
 @Composable
 private fun UtilityButtons(
     viewModel: MusicViewModel,
-    isCompact: Boolean = false
+    imageColors: ImageColors = ImageColors(),
+    modifier: Modifier = Modifier
 ) {
-
     val isRepeatEnabled by viewModel.isRepeatEnabled.collectAsState()
     val isShuffleEnabled by viewModel.isShuffleEnabled.collectAsState()
 
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .widthIn(max = 320.dp),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         IconButton(
             onClick = viewModel::toggleShuffle,
-            modifier = Modifier.size(if (isCompact) 44.dp else 48.dp)
+            modifier = Modifier
+                .size(48.dp)
+                .background(
+                    color = imageColors.muted.copy(alpha = 0.3f),
+                    shape = CircleShape
+                )
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_shuffle),
@@ -559,15 +520,20 @@ private fun UtilityButtons(
                 tint = if (isShuffleEnabled) {
                     ZenifyPrimary
                 } else {
-                   Color.White.copy(alpha = 0.8f)
+                    Color.White.copy(alpha = 0.8f)
                 },
-                modifier = Modifier.size(if (isCompact) 20.dp else 22.dp)
+                modifier = Modifier.size(22.dp)
             )
         }
 
         IconButton(
             onClick = viewModel::toggleRepeat,
-            modifier = Modifier.size(if (isCompact) 44.dp else 48.dp)
+            modifier = Modifier
+                .size(48.dp)
+                .background(
+                    color = imageColors.muted.copy(alpha = 0.3f),
+                    shape = CircleShape
+                )
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_repeat),
@@ -575,39 +541,49 @@ private fun UtilityButtons(
                 tint = if (isRepeatEnabled) {
                     ZenifyPrimary
                 } else {
-                   Color.White.copy(alpha = 0.8f)
+                    Color.White.copy(alpha = 0.8f)
                 },
-                modifier = Modifier.size(if (isCompact) 20.dp else 22.dp)
+                modifier = Modifier.size(22.dp)
             )
         }
 
         IconButton(
             onClick = { },
-            modifier = Modifier.size(if (isCompact) 44.dp else 48.dp)
+            modifier = Modifier
+                .size(48.dp)
+                .background(
+                    color = imageColors.muted.copy(alpha = 0.3f),
+                    shape = CircleShape
+                )
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_share),
                 contentDescription = "Share",
-                tint =Color.White.copy(alpha = 0.8f),
-                modifier = Modifier.size(if (isCompact) 20.dp else 22.dp)
+                tint = Color.White.copy(alpha = 0.8f),
+                modifier = Modifier.size(22.dp)
             )
         }
 
         IconButton(
             onClick = { },
-            modifier = Modifier.size(if (isCompact) 44.dp else 48.dp)
+            modifier = Modifier
+                .size(48.dp)
+                .background(
+                    color = imageColors.muted.copy(alpha = 0.3f),
+                    shape = CircleShape
+                )
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_bookmark),
                 contentDescription = "Bookmark",
-                tint =Color.White.copy(alpha = 0.8f),
-                modifier = Modifier.size(if (isCompact) 20.dp else 22.dp)
+                tint = Color.White.copy(alpha = 0.8f),
+                modifier = Modifier.size(22.dp)
             )
         }
     }
 }
 
-@Preview(showBackground = true,/* device = "spec:width=360dp,height=640dp"*/)
+@Preview(showBackground = true)
 @Composable
 fun PlayerScreenPreview() {
     PlayerScreen(

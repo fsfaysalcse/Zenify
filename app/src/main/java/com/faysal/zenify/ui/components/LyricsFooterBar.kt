@@ -52,7 +52,7 @@ fun LyricsHeaderBar(
         ) {
             Text(
                 text = "Up Next",
-                color = MaterialTheme.colorScheme.onSurface,
+                color = Color.White,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
                 fontFamily = AvenirNext,
@@ -60,7 +60,7 @@ fun LyricsHeaderBar(
             )
             Text(
                 text = "Life without you",
-                color = MaterialTheme.colorScheme.onSurface,
+                color = Color.White,
                 fontSize = 9.sp,
                 fontWeight = FontWeight.Normal,
                 fontFamily = AvenirNext,
@@ -71,7 +71,7 @@ fun LyricsHeaderBar(
         Box(
             modifier = Modifier
                 .size(32.dp)
-                .background(Color.Black.copy(alpha = 0.3f), shape = CircleShape)
+                .background(Color.Transparent.copy(alpha = 0.3f), shape = CircleShape)
                 .clickable { onFullScreenClick() },
             contentAlignment = Alignment.Center
         ) {

@@ -65,8 +65,8 @@ fun RhythmTimeline(
             Color(0xFFFFFFFF)
         )
     ),
-    trackColor: Color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.15f),
-    thumbColor: Color = MaterialTheme.colorScheme.onSurface,
+    trackColor: Color = Color.White.copy(alpha = 0.15f),
+    thumbColor: Color = Color.White,
     trackHeight: Float = 4f,
     thumbRadius: Float = 8f,
     glowEffect: Boolean = true
@@ -117,7 +117,7 @@ fun RhythmTimeline(
                 text = formatTime(currentMs),
                 fontFamily = Nunito,
                 fontSize = 13.sp,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+                color = Color.White.copy(alpha = 0.8f)
             )
 
             Box(
@@ -178,7 +178,7 @@ fun RhythmTimeline(
                 text = formatTime(durationMs),
                 fontFamily = Nunito,
                 fontSize = 13.sp,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                color = Color.White.copy(alpha = 0.6f)
             )
         }
     }
