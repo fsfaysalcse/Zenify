@@ -2,6 +2,7 @@ package com.faysal.zenify.ui.util
 
 import androidx.core.net.toUri
 import com.faysal.zenify.domain.model.Audio
+import com.faysal.zenify.domain.model.FavouriteAudio
 
 
 const val NOTIFICATION_ID = 1001
@@ -97,3 +98,14 @@ val sampleAudios = listOf(
         uri = "content://media/external/audio/media/8".toUri()
     )
 )
+
+fun List<Audio>.toFavAudio() : List<FavouriteAudio> {
+    return this.map {
+        FavouriteAudio(
+            id = it.id,
+            audioId = it.id,
+            audio = it,
+            addedAt = System.currentTimeMillis()
+        )
+    }
+}

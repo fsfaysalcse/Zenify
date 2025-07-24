@@ -54,9 +54,10 @@ fun HomeScreen(
     ) {
 
 
-        NavigationDrawerBackground() {
+        NavigationDrawerBackground {
             DrawerScreen(
                 modifier = Modifier,
+                navController = navController,
                 isDrawerOpen = drawerState != DrawerState.CLOSED
             )
         }

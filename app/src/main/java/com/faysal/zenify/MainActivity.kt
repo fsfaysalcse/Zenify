@@ -11,9 +11,11 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.content.ContextCompat
+import androidx.media3.common.util.UnstableApi
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.faysal.zenify.ui.screen.FavouritesScreen
 import com.faysal.zenify.ui.screen.HomeScreen
 import com.faysal.zenify.ui.screen.OnBoardScreen
 import com.faysal.zenify.ui.screen.Screen
@@ -21,6 +23,8 @@ import com.faysal.zenify.ui.screen.SettingsScreen
 import com.faysal.zenify.ui.theme.ZenifyTheme
 
 class MainActivity : ComponentActivity() {
+
+    @UnstableApi
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,6 +63,10 @@ class MainActivity : ComponentActivity() {
                     }
                     composable(Screen.Settings.route) {
                         SettingsScreen(navController)
+                    }
+
+                    composable(Screen.Favourite.route) {
+                        FavouritesScreen(navController)
                     }
                 }
             }

@@ -8,6 +8,8 @@ import com.faysal.zenify.data.service.MusicServiceConnection
 import com.faysal.zenify.domain.model.Audio
 import com.faysal.zenify.domain.model.FavouriteAudio
 import com.faysal.zenify.domain.usecases.*
+import com.faysal.zenify.ui.util.sampleAudios
+import com.faysal.zenify.ui.util.toFavAudio
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -25,7 +27,7 @@ class FavouriteViewModel(
     private val _uiState = MutableStateFlow(FavouriteUiState())
     val uiState: StateFlow<FavouriteUiState> = _uiState.asStateFlow()
 
-    val favourites: StateFlow<List<FavouriteAudio>> = getFavouritesUseCase()
+    var favourites: StateFlow<List<FavouriteAudio>> = getFavouritesUseCase()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
@@ -149,6 +151,25 @@ class FavouriteViewModel(
                 }
             }
         }
+    }
+
+    fun loadDummyMusic() {
+        _uiState.value = _uiState.value.copy(
+            isEmpty = false,
+            isLoading = false,
+        )
+
+        favourites = flowOf(sampleAudios.map { audio ->
+            FavouriteAudio(
+                id = audio.id,
+                audioId = audio.id,
+                audio = audio
+            )
+        }).stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = sampleAudios.toFavAudio()
+        )
     }
 
     fun clearError() {

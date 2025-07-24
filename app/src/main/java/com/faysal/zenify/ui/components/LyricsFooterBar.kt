@@ -52,7 +52,7 @@ fun LyricsHeaderBar(
         ) {
             Text(
                 text = "Up Next",
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
                 fontFamily = AvenirNext,
@@ -60,7 +60,7 @@ fun LyricsHeaderBar(
             )
             Text(
                 text = "Life without you",
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontSize = 9.sp,
                 fontWeight = FontWeight.Normal,
                 fontFamily = AvenirNext,
@@ -78,7 +78,7 @@ fun LyricsHeaderBar(
             Image(
                 painter = painterResource(id = R.drawable.ic_up),
                 contentDescription = "Share",
-                colorFilter = ColorFilter.tint(Color.White),
+                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface),
                 modifier = Modifier.size(16.dp)
             )
         }

@@ -62,11 +62,11 @@ fun RhythmTimeline(
     progressGradient: Brush = Brush.horizontalGradient(
         colors = listOf(
             Color(0xFF8B5CF6),
-            Color(0xFFFFFFFF)
+            MaterialTheme.colorScheme.onSurface
         )
     ),
-    trackColor: Color = Color.White.copy(alpha = 0.15f),
-    thumbColor: Color = Color.White,
+    trackColor: Color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.15f),
+    thumbColor: Color = MaterialTheme.colorScheme.onSurface,
     trackHeight: Float = 4f,
     thumbRadius: Float = 8f,
     glowEffect: Boolean = true

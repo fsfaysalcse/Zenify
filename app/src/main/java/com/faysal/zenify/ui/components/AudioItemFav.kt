@@ -85,7 +85,7 @@ fun AudioItem(
         Box(
             modifier = Modifier
                 .size(56.dp)
-                .clip(RoundedCornerShape(16.dp))
+                .clip(RoundedCornerShape(8.dp))
         ) {
             when {
                 bitmapCache[audio.id] != null -> {
@@ -205,18 +205,6 @@ fun AudioItem(
                         modifier = Modifier.size(22.dp)
                     )
                 }
-            }
-
-            IconButton(
-                onClick = {},
-                modifier = Modifier.size(40.dp)
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_more),
-                    contentDescription = "More options",
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(20.dp)
-                )
             }
         }
     }

@@ -14,12 +14,15 @@ import com.faysal.zenify.data.service.MusicServiceConnection
 import com.faysal.zenify.domain.repository.FakeAudioRepository
 import com.faysal.zenify.domain.repository.FakeFavouriteRepository
 import com.faysal.zenify.domain.repository.FakeQueueRepository
+import com.faysal.zenify.domain.usecases.AddToFavouritesUseCase
 import com.faysal.zenify.domain.usecases.AddToQueueNextUseCase
 import com.faysal.zenify.domain.usecases.AddToQueueUseCase
 import com.faysal.zenify.domain.usecases.GetAudiosUseCase
+import com.faysal.zenify.domain.usecases.GetFavouritesUseCase
 import com.faysal.zenify.domain.usecases.IsFavouriteFlowUseCase
 import com.faysal.zenify.domain.usecases.RemoveFromFavouritesUseCase
 import com.faysal.zenify.domain.usecases.ToggleFavouriteUseCase
+import com.faysal.zenify.ui.viewModels.FavouriteViewModel
 import com.faysal.zenify.ui.viewModels.MusicViewModel
 
 
@@ -53,6 +56,41 @@ fun rememberFakeMusicViewModel(): MusicViewModel {
 
     LaunchedEffect(Unit) {
         viewModel.loadAudios()
+    }
+
+    return viewModel
+}
+
+
+
+@OptIn(UnstableApi::class)
+@Composable
+fun rememberFakeFavouriteViewModel(): FavouriteViewModel {
+    val context = LocalContext.current
+    val factory = remember {
+        object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                val queueRepository = FakeQueueRepository()
+                val favouriteRepository = FakeFavouriteRepository()
+                val serviceConnect = MusicServiceConnection(context)
+                @Suppress("UNCHECKED_CAST")
+                return FavouriteViewModel(
+                    serviceConnection = serviceConnect,
+                    addToQueueUseCase = AddToQueueUseCase(queueRepository),
+                    toggleFavouriteUseCase = ToggleFavouriteUseCase(favouriteRepository),
+                    isFavouriteFlowUseCase = IsFavouriteFlowUseCase(favouriteRepository),
+                    removeFromFavouritesUseCase = RemoveFromFavouritesUseCase(favouriteRepository),
+                    addToFavouritesUseCase = AddToFavouritesUseCase(favouriteRepository),
+                    getFavouritesUseCase = GetFavouritesUseCase(favouriteRepository)
+                ) as T
+            }
+        }
+    }
+
+    val viewModel: FavouriteViewModel = viewModel(factory = factory)
+
+    LaunchedEffect(Unit) {
+        viewModel.loadDummyMusic()
     }
 
     return viewModel

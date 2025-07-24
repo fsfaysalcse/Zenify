@@ -111,11 +111,11 @@ fun CommonSongListScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(240.dp)
+                .clip(RoundedCornerShape(8.dp))
         ) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .clip(RoundedCornerShape(8.dp))
                     .background(MusicPrimaryColor)
             ) {
                 when {
@@ -218,7 +218,7 @@ fun CommonSongListScreen(
                 icon = painterResource(R.drawable.ic_play),
                 text = "Play",
                 onClick = { onPlayAll(audios) },
-                backgroundColor = ZenifyPrimary,
+                backgroundColor = MaterialTheme.colorScheme.primary,
                 contentColor = Color.White
             )
             IconTextButton(

@@ -115,7 +115,7 @@ fun OnBoardScreen(navController: NavHostController) {
                 }
                 musicLauncher.launch(permission)
             },
-            onContinue = { navController.navigate("home") }
+            onContinue = { navController.navigate(Screen.Home.route) }
         )
     }
 }

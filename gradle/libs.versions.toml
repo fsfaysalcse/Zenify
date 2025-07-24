@@ -19,6 +19,7 @@ palette = "1.0.0"
 
 
 room = "2.7.1"
+lottieCompose = "6.6.7"
 
 
 [libraries]
@@ -61,6 +62,9 @@ kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 roomRuntime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 roomCompiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 roomKtx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+
+lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "lottieCompose" }
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -22,6 +22,9 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -105,15 +108,16 @@ fun PlayerScreen(
             else -> ImageColors()
         }
     }
+
+
     AIMusicPlayerBackground(
         primaryColor = imageColors.vibrant,
-        secondaryColor = imageColors.dominant,
-        accentColor = imageColors.muted
+        secondaryColor = imageColors.vibrant,
+        accentColor = imageColors.vibrant
     ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black)
                 .onSizeChanged { screenSize = it }
         ) {
 
@@ -248,14 +252,14 @@ private fun PlayerHeader(
                 Icon(
                     painter = painterResource(id = R.drawable.ic_arrow_down),
                     contentDescription = "Back",
-                    tint = Color.White,
+                    tint = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.size(24.dp)
                 )
             }
 
             Text(
                 text = "Now Playing",
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontSize = 16.sp,
                 fontFamily = AvenirNext,
                 fontWeight = FontWeight.Medium,
@@ -269,7 +273,7 @@ private fun PlayerHeader(
                 Icon(
                     painter = painterResource(id = R.drawable.ic_more),
                     contentDescription = "More",
-                    tint = Color.White,
+                    tint = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.size(24.dp)
                 )
             }
@@ -382,12 +386,12 @@ private fun AlbumArtSection(
                     .size(size)
                     .aspectRatio(1f),
                 shape = RoundedCornerShape(16.dp),
-                color = Color.White.copy(alpha = 0.1f)
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.default_cover),
                     contentDescription = "No Cover",
-                    tint = Color.White.copy(alpha = 0.6f),
+                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                     modifier = Modifier.size(48.dp)
                 )
             }
@@ -408,7 +412,7 @@ private fun TrackInfoSection(
     ) {
         Text(
             text = title,
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onSurface,
             fontSize = 22.sp,
             fontFamily = AvenirNext,
             fontWeight = FontWeight.SemiBold,
@@ -423,7 +427,7 @@ private fun TrackInfoSection(
 
         Text(
             text = artist,
-            color = Color.White.copy(alpha = 0.75f),
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f),
             fontSize = 16.sp,
             fontFamily = AvenirNext,
             fontWeight = FontWeight.Normal,
@@ -460,7 +464,7 @@ private fun MainControlButtons(
             Icon(
                 painter = painterResource(id = R.drawable.ic_left),
                 contentDescription = "Previous",
-                tint = Color.White,
+                tint = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.size(24.dp)
             )
         }
@@ -493,7 +497,7 @@ private fun MainControlButtons(
             Icon(
                 painter = painterResource(id = R.drawable.ic_right),
                 contentDescription = "Next",
-                tint = Color.White,
+                tint = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.size(24.dp)
             )
         }
@@ -534,7 +538,7 @@ private fun UtilityButtons(
                 tint = if (isShuffleEnabled) {
                     ZenifyPrimary
                 } else {
-                    Color.White.copy(alpha = 0.8f)
+                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
                 },
                 modifier = Modifier.size(22.dp)
             )
@@ -555,7 +559,7 @@ private fun UtilityButtons(
                 tint = if (isRepeatEnabled) {
                     ZenifyPrimary
                 } else {
-                    Color.White.copy(alpha = 0.8f)
+                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
                 },
                 modifier = Modifier.size(22.dp)
             )
@@ -573,7 +577,7 @@ private fun UtilityButtons(
             Icon(
                 painter = painterResource(id = R.drawable.ic_share),
                 contentDescription = "Share",
-                tint = Color.White.copy(alpha = 0.8f),
+                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
                 modifier = Modifier.size(22.dp)
             )
         }
@@ -597,13 +601,15 @@ private fun UtilityButtons(
                     shape = CircleShape
                 )
         ) {
+            val icon = if (isFavourite) Icons.Default.Favorite else Icons.Default.FavoriteBorder
+
             Icon(
-                painter = painterResource(id = R.drawable.ic_bookmark),
+                imageVector = icon,
                 contentDescription = "Bookmark",
                 tint = if (isFavourite) {
                     ZenifyPrimary
                 } else {
-                    Color.White.copy(alpha = 0.8f)
+                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
                 },
                 modifier = Modifier.size(22.dp)
             )

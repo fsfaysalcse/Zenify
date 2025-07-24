@@ -98,4 +98,8 @@ dependencies {
     annotationProcessor(libs.roomCompiler)
     ksp(libs.roomCompiler)
     implementation(libs.roomKtx)
+
+    //Lottie
+    implementation(libs.lottie.compose)
+
 }
