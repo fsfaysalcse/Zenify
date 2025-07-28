@@ -102,4 +102,17 @@ dependencies {
     //Lottie
     implementation(libs.lottie.compose)
 
+    // For drag and drop reordering
+    implementation(libs.reorderable)
+
+    // Compose Raw
+
+    implementation("androidx.compose.animation:animation:1.8.3")
+    implementation("androidx.compose.foundation:foundation:1.8.3")
+
+    //Reorderable
+    implementation("sh.calvin.reorderable:reorderable:2.4.3")
+
+
+
 }

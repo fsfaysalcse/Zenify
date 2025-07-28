@@ -1,6 +1,6 @@
 [versions]
 agp = "8.11.1"
-coilCompose = "3.2.0"
+coilCompose = "3.3.0"
 datastore = "1.1.7"
 kotlin = "2.2.0"
 coreKtx = "1.16.0"
@@ -18,7 +18,8 @@ navigationCompose = "2.9.2"
 palette = "1.0.0"
 
 
-room = "2.7.1"
+reorderable = "0.9.6"
+room = "2.7.2"
 lottieCompose = "6.6.7"
 
 
@@ -44,6 +45,7 @@ androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-co
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
+compose-animation = { group = "androidx.compose.animation", name = "animation" }
 androidx-ui = { group = "androidx.compose.ui", name = "ui" }
 androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
 androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
@@ -59,6 +61,7 @@ koin-android = { module = "io.insert-koin:koin-android" }
 koin-compose = {module = "io.insert-koin:koin-androidx-compose"}
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 
+reorderable = { module = "org.burnoutcrew.composereorderable:reorderable", version.ref = "reorderable" }
 roomRuntime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 roomCompiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 roomKtx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }

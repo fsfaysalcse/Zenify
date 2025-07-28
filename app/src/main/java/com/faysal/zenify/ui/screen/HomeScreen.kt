@@ -22,7 +22,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import androidx.navigation.NavHostController
-import com.faysal.zenify.ui.components.MusicPlayerHomeBackground
 import com.faysal.zenify.ui.components.NavigationDrawerBackground
 import kotlinx.coroutines.launch
 import me.fsfaysalcse.discoverbd.ui.model.DrawerState
@@ -115,8 +114,8 @@ fun HomeScreen(
                     }
                 )
         ) {
-            MusicPlayerHomeBackground() {
-            HomeContent(
+
+        HomeContent(
                         drawerState = drawerState,
                         onNavigationClick = {
                             scope.launch {
@@ -133,7 +132,7 @@ fun HomeScreen(
                             }
                         }
                     )
-                }
+
 
         }
     }

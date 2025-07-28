@@ -64,6 +64,7 @@ import com.faysal.zenify.ui.components.AudioItem
 import com.faysal.zenify.ui.components.FavouriteBackground
 import com.faysal.zenify.ui.components.IconActionButton
 import com.faysal.zenify.ui.theme.AvenirNext
+import com.faysal.zenify.ui.theme.NavFont
 import com.faysal.zenify.ui.theme.ProductSans
 import com.faysal.zenify.ui.viewModels.FavouriteViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -376,11 +377,12 @@ private fun LottieHeader(
             verticalArrangement = Arrangement.Top
         ) {
             Text(
-                text = "My Favourites",
-                fontSize = 9.sp,
+                text = "My Favourites".uppercase(),
+                fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
-                fontFamily = AvenirNext,
+                fontFamily = NavFont,
+                letterSpacing = 4.sp,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )

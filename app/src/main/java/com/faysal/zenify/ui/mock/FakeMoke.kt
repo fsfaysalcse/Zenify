@@ -17,13 +17,18 @@ import com.faysal.zenify.domain.repository.FakeQueueRepository
 import com.faysal.zenify.domain.usecases.AddToFavouritesUseCase
 import com.faysal.zenify.domain.usecases.AddToQueueNextUseCase
 import com.faysal.zenify.domain.usecases.AddToQueueUseCase
+import com.faysal.zenify.domain.usecases.ClearQueueUseCase
 import com.faysal.zenify.domain.usecases.GetAudiosUseCase
 import com.faysal.zenify.domain.usecases.GetFavouritesUseCase
+import com.faysal.zenify.domain.usecases.GetQueueItemsUseCase
 import com.faysal.zenify.domain.usecases.IsFavouriteFlowUseCase
+import com.faysal.zenify.domain.usecases.MoveQueueItemUseCase
 import com.faysal.zenify.domain.usecases.RemoveFromFavouritesUseCase
+import com.faysal.zenify.domain.usecases.RemoveFromQueueUseCase
 import com.faysal.zenify.domain.usecases.ToggleFavouriteUseCase
 import com.faysal.zenify.ui.viewModels.FavouriteViewModel
 import com.faysal.zenify.ui.viewModels.MusicViewModel
+import com.faysal.zenify.ui.viewModels.QueueViewModel
 
 
 @OptIn(UnstableApi::class)
@@ -37,6 +42,7 @@ fun rememberFakeMusicViewModel(): MusicViewModel {
                 val queueRepository = FakeQueueRepository()
                 val favouriteRepository = FakeFavouriteRepository()
                 val serviceConnect = MusicServiceConnection(context)
+                val playlistDataStore = com.faysal.zenify.data.datastore.PlaylistDataStore(context)
                 @Suppress("UNCHECKED_CAST")
                 return MusicViewModel(
                     serviceConnection = serviceConnect,
@@ -46,7 +52,9 @@ fun rememberFakeMusicViewModel(): MusicViewModel {
                     toggleFavouriteUseCase = ToggleFavouriteUseCase(favouriteRepository),
                     isFavouriteFlowUseCase = IsFavouriteFlowUseCase(favouriteRepository),
                     removeFromFavouritesUseCase = RemoveFromFavouritesUseCase(favouriteRepository),
-                    savedStateHandle = SavedStateHandle()
+                    savedStateHandle = SavedStateHandle(),
+                    playlistDataStore = playlistDataStore,
+                    playbackStateManager = com.faysal.zenify.data.datastore.PlaybackStateManager(context),
                 ) as T
             }
         }
@@ -94,4 +102,30 @@ fun rememberFakeFavouriteViewModel(): FavouriteViewModel {
     }
 
     return viewModel
+}
+
+
+@UnstableApi
+@Composable
+fun rememberFakeQueueViewModel(): QueueViewModel {
+    val context = LocalContext.current
+    val factory = remember {
+        object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                val queueRepository = FakeQueueRepository()
+                @Suppress("UNCHECKED_CAST")
+                return QueueViewModel(
+                    serviceConnection = MusicServiceConnection(context),
+                    addToQueueUseCase = AddToQueueUseCase(queueRepository),
+                    addToQueueNextUseCase = AddToQueueNextUseCase(queueRepository),
+                    removeFromQueueUseCase = RemoveFromQueueUseCase(queueRepository),
+                    moveQueueItemUseCase = MoveQueueItemUseCase(queueRepository),
+                    clearQueueUseCase = ClearQueueUseCase(queueRepository),
+                    getQueueItemsUseCase = GetQueueItemsUseCase(queueRepository),
+                ) as T
+            }
+        }
+    }
+
+    return viewModel(factory = factory)
 }

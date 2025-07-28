@@ -14,6 +14,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ModalBottomSheetProperties
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -34,6 +37,7 @@ import androidx.media3.common.util.UnstableApi
 import com.faysal.zenify.ui.components.MiniPlayer
 import com.faysal.zenify.ui.components.ModernCustomTabBar
 import com.faysal.zenify.ui.components.ModernSearchBar
+import com.faysal.zenify.ui.components.MusicPlayerHomeBackground
 import com.faysal.zenify.ui.mock.rememberFakeMusicViewModel
 import com.faysal.zenify.ui.states.MusicScreen
 import com.faysal.zenify.ui.viewModels.MusicViewModel
@@ -63,6 +67,16 @@ fun HomeContent(
 
     val backStack = viewModel.backStack.last()
 
+    val snackbarHostState = remember { SnackbarHostState() }
+    val error by viewModel.error.collectAsState()
+
+    LaunchedEffect(error) {
+        error?.let {
+            snackbarHostState.showSnackbar(it)
+            viewModel.clearError()
+        }
+    }
+
     LaunchedEffect(pagerState.currentPage) {
         when (pagerState.currentPage) {
             0 -> viewModel.resetBackStack(MusicScreen.Overview)
@@ -73,102 +87,108 @@ fun HomeContent(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .statusBarsPadding()
-                .fillMaxSize()
-                .padding(bottom = if (currentAudio != null) 88.dp else 0.dp)
-        ) {
+    MusicPlayerHomeBackground() {
+        Scaffold(
+            snackbarHost = { SnackbarHost(snackbarHostState) }
+        ) { innerPadding ->
+            Box(modifier = Modifier.fillMaxSize()) {
+                Column(
+                    modifier = Modifier
+                        .statusBarsPadding()
+                        .padding(
+                            bottom = innerPadding.calculateBottomPadding(),
+                        )
+                        .fillMaxSize()
+                        .padding(bottom = if (currentAudio != null) 88.dp else 0.dp)
+                ) {
+                    AnimatedVisibility(!backStack.hideHomeScreen()) {
+                        Column {
+                            ModernSearchBar(
+                                modifier = Modifier
+                                    .padding(top = 8.dp)
+                                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                                drawerState = drawerState,
+                                onNavigationClick = onNavigationClick,
+                            )
 
-
-            AnimatedVisibility(!backStack.hideHomeScreen()) {
-                Column {
-                    ModernSearchBar(
-                        modifier = Modifier
-                            .padding(top = 8.dp)
-                            .padding(horizontal = 16.dp, vertical = 8.dp),
-                        drawerState = drawerState,
-                        onNavigationClick = onNavigationClick,
-                        backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
-                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-
-                    ModernCustomTabBar(
-                        tabs = tabs,
-                        selectedTabIndex = pagerState.currentPage,
-                        onTabSelected = { index ->
-                            coroutineScope.launch {
-                                pagerState.animateScrollToPage(index)
-                            }
+                            ModernCustomTabBar(
+                                tabs = tabs,
+                                selectedTabIndex = pagerState.currentPage,
+                                onTabSelected = { index ->
+                                    coroutineScope.launch {
+                                        pagerState.animateScrollToPage(index)
+                                    }
+                                }
+                            )
                         }
+                    }
+
+                    HorizontalPager(
+                        state = pagerState,
+                        userScrollEnabled = false,
+                        modifier = Modifier.weight(1f)
+                    ) { page ->
+                        when (page) {
+                            0 -> OverviewScreen(audios, bitmapCache, viewModel)
+                            1 -> SongsScreen(audios, bitmapCache, viewModel)
+                            2 -> AlbumsScreen(audios, bitmapCache, viewModel)
+                            3 -> ArtistsScreen(audios, bitmapCache, viewModel)
+                            4 -> FoldersScreen(audios, bitmapCache, viewModel)
+                        }
+                    }
+                }
+
+                if (currentAudio != null) {
+                    MiniPlayer(
+                        isPlaying = isPlaying,
+                        currentAudio = currentAudio!!,
+                        onPlayPauseClick = {
+                            if (isPlaying) {
+                                viewModel.playPause()
+                            } else {
+                                viewModel.playAudio(currentAudio!!)
+                            }
+                        },
+                        onExpandClick = {
+                            showFullScreenPlayer = true
+                        },
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(bottom = 0.dp)
                     )
                 }
 
-            }
-
-
-            HorizontalPager(
-                state = pagerState,
-                modifier = Modifier.weight(1f)
-            ) { page ->
-                when (page) {
-                    0 -> OverviewScreen(audios, bitmapCache, viewModel)
-                    1 -> SongsScreen(audios, bitmapCache, viewModel)
-                    2 -> AlbumsScreen(audios, bitmapCache, viewModel)
-                    3 -> ArtistsScreen(audios, bitmapCache, viewModel)
-                    4 -> FoldersScreen(audios, bitmapCache, viewModel)
+                if (showFullScreenPlayer && currentAudio != null) {
+                    ModalBottomSheet(
+                        onDismissRequest = { showFullScreenPlayer = false },
+                        sheetState = bottomSheetState,
+                        containerColor = Color.Black,
+                        contentColor = Color.Black,
+                        tonalElevation = 8.dp,
+                        shape = RectangleShape,
+                        properties = ModalBottomSheetProperties(
+                            shouldDismissOnBackPress = true,
+                        ),
+                        dragHandle = null
+                    ) {
+                        PlayerScreen(
+                            viewModel = viewModel,
+                            onMinimizeClick = { showFullScreenPlayer = false }
+                        )
+                    }
                 }
-            }
-        }
-
-        if (currentAudio != null) {
-            MiniPlayer(
-                isPlaying = isPlaying,
-                currentAudio = currentAudio!!,
-                onPlayPauseClick = {
-                    if (isPlaying) viewModel.playPause()
-                    else viewModel.playAudio(currentAudio!!)
-                },
-                onExpandClick = {
-                    showFullScreenPlayer = true
-                },
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 0.dp)
-            )
-        }
-
-        if (showFullScreenPlayer && currentAudio != null) {
-            ModalBottomSheet(
-                onDismissRequest = { showFullScreenPlayer = false },
-                sheetState = bottomSheetState,
-                containerColor = Color.Black,
-                contentColor = Color.Black,
-                tonalElevation = 8.dp,
-                shape = RectangleShape,
-                properties = ModalBottomSheetProperties(
-                    shouldDismissOnBackPress = true,
-                ),
-                dragHandle = null
-            ) {
-                PlayerScreen(
-                    viewModel = viewModel,
-                    onMinimizeClick = { showFullScreenPlayer = false }
-                )
             }
         }
     }
 }
 
-@ExperimentalMaterial3Api
-@OptIn(UnstableApi::class)
-@Preview
-@Composable
-fun HomeContentPreview() {
-    HomeContent(
-        viewModel = rememberFakeMusicViewModel(),
-        drawerState = DrawerState.OPEN,
-        onNavigationClick = {}
-    )
-}
+
+//@Preview
+//@Composable
+//fun HomeContentPreview() {
+//    HomeContent(
+//        viewModel = rememberFakeMusicViewModel(),
+//        drawerState = DrawerState.OPEN,
+//        onNavigationClick = {}
+//    )
+//}

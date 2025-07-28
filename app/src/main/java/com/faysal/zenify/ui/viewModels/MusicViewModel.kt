@@ -6,6 +6,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.util.UnstableApi
+import com.faysal.zenify.data.datastore.PlaybackStateManager
+import com.faysal.zenify.data.datastore.PlaylistDataStore
 import com.faysal.zenify.data.service.MusicServiceConnection
 import com.faysal.zenify.domain.model.Audio
 import com.faysal.zenify.domain.usecases.AddToQueueNextUseCase
@@ -22,6 +24,8 @@ import kotlinx.coroutines.launch
 
 @UnstableApi
 class MusicViewModel(
+    private val playbackStateManager: PlaybackStateManager,
+    private val playlistDataStore: PlaylistDataStore,
     private val serviceConnection: MusicServiceConnection,
     private val getAudiosUseCase: GetAudiosUseCase,
     private val savedStateHandle: SavedStateHandle,
@@ -59,10 +63,14 @@ class MusicViewModel(
     private val _backStack = mutableStateListOf<MusicScreen>()
     val backStack: SnapshotStateList<MusicScreen> = _backStack
 
+    private val _error = MutableStateFlow<String?>(null)
+    val error: StateFlow<String?> = _error
+
     init {
         serviceConnection.bindService()
         observeServiceConnection()
         loadAudios()
+        restorePlaybackState()
 
         val saved = savedStateHandle.get<List<String>>("backStack")
         if (saved != null) {
@@ -163,18 +171,67 @@ class MusicViewModel(
     }
 
     fun playAudio(audio: Audio) {
-        serviceConnection.playAudio(audio)
+        viewModelScope.launch {
+            try {
+                serviceConnection.playAudio(audio) // <-- Start playback via service
+                playlistDataStore.saveLastPlayedId(audio.id.toLongOrNull() ?: -1L)
+                playbackStateManager.savePlayingState(true)
+            } catch (e: Exception) {
+                _error.value = "Failed to play audio: ${e.message}"
+            }
+        }
     }
 
     fun setPlaylist(audios: List<Audio>) {
         serviceConnection.setPlaylist(audios)
     }
 
+
     fun playPause() {
-        if (_isPlaying.value) {
-            serviceConnection.pauseAudio()
-        } else {
-            serviceConnection.resumeAudio()
+        viewModelScope.launch {
+            try {
+                if (_isPlaying.value) {
+                    serviceConnection.pauseAudio()
+                } else {
+                    val audio = _currentAudio.value
+                    if (audio != null) {
+                        serviceConnection.playAudio(audio) // Play the current audio
+                    } else {
+                        _error.value = "No audio selected to play."
+                        return@launch
+                    }
+                }
+                playbackStateManager.savePlayingState(!_isPlaying.value)
+            } catch (e: Exception) {
+                _error.value = "Failed to toggle playback: ${e.message}"
+            }
+        }
+    }
+
+    fun clearError() {
+        _error.value = null
+    }
+
+    private fun restorePlaybackState() {
+        viewModelScope.launch {
+            try {
+                val lastPlayedId = playlistDataStore.lastPlayedId
+                val isPlayingFlow = playbackStateManager.isPlaying
+
+                lastPlayedId.collect { id ->
+                    if (id != -1L) {
+                        val audio = _audios.value.find { it.id == id.toString() }
+                        if (audio != null) {
+                            _currentAudio.value = audio
+                        }
+                    }
+                }
+                isPlayingFlow.collect { playing ->
+                    _isPlaying.value = playing
+                }
+            } catch (e: Exception) {
+                _error.value = "Failed to restore playback state: ${e.message}"
+            }
         }
     }
 
@@ -217,13 +274,11 @@ class MusicViewModel(
         }
     }
 
-
     fun removeFromFavourites(audioId: String) {
         viewModelScope.launch {
             removeFromFavouritesUseCase(audioId)
         }
     }
-
 
     fun isFavourite(audioId: String) = isFavouriteFlowUseCase(audioId)
 

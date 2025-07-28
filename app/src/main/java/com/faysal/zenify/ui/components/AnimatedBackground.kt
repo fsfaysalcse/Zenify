@@ -77,7 +77,7 @@ fun AIMusicPlayerBackground(
                 Brush.radialGradient(
                     colors = listOf(
                         MaterialTheme.colorScheme.surface,
-                        primaryColor.copy(0.4f),
+                        MaterialTheme.colorScheme.surface,
                         MaterialTheme.colorScheme.surface
                     ),
                     radius = 800f

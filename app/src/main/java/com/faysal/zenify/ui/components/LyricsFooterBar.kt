@@ -15,6 +15,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,8 +28,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.media3.common.util.UnstableApi
 import com.faysal.zenify.R
+import com.faysal.zenify.ui.mock.rememberFakeQueueViewModel
 import com.faysal.zenify.ui.theme.AvenirNext
+import com.faysal.zenify.ui.viewModels.QueueViewModel
+import org.koin.androidx.compose.koinViewModel
 
 /**
  * A top bar for the lyrics section with a title and action buttons.
@@ -34,12 +42,25 @@ import com.faysal.zenify.ui.theme.AvenirNext
  * @param onFullScreenClick Callback triggered when the fullscreen button is clicked.
  */
 
+@UnstableApi
 @Composable
 fun LyricsHeaderBar(
     onShareClick: () -> Unit = {},
     onFullScreenClick: () -> Unit = {},
-    modifier: Modifier
+    modifier: Modifier,
+    queueViewModel : QueueViewModel = koinViewModel()
 ) {
+
+    var showQueueDialog by remember { mutableStateOf(false) }
+
+
+    if (showQueueDialog) {
+        QueueDialog(
+            viewModel = queueViewModel,
+            onDismiss = { showQueueDialog = false }
+        )
+    }
+
     Row(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -72,7 +93,9 @@ fun LyricsHeaderBar(
             modifier = Modifier
                 .size(32.dp)
                 .background(Color.Transparent.copy(alpha = 0.3f), shape = CircleShape)
-                .clickable { onFullScreenClick() },
+                .clickable {
+                    showQueueDialog = true
+                },
             contentAlignment = Alignment.Center
         ) {
             Image(
@@ -85,6 +108,7 @@ fun LyricsHeaderBar(
     }
 }
 
+@UnstableApi
 @Preview
 @Composable
 fun LyricsHeaderBarPreview() {
@@ -96,7 +120,8 @@ fun LyricsHeaderBarPreview() {
             LyricsHeaderBar(
                 onShareClick = {},
                 onFullScreenClick = {},
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                queueViewModel = rememberFakeQueueViewModel()
             )
         }
     }

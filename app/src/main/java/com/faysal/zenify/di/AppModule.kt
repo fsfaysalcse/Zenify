@@ -49,6 +49,7 @@ val databaseModule = module {
 
     single { get<ZenifyDatabase>().queueDao() }
     single { get<ZenifyDatabase>().favouriteDao() }
+    single { com.faysal.zenify.data.datastore.PlaylistDataStore(androidContext()) }
 }
 
 val repositoryModule = module {
@@ -88,7 +89,7 @@ val serviceModule = module {
 
 @UnstableApi
 val viewModelModule = module {
-    viewModel { MusicViewModel(get(), get(), get(),get(),get(),get(),get(),get()) }
+    viewModel { MusicViewModel(get(), get(), get(),get(),get(),get(),get(),get(),get(),get()) }
     viewModel { QueueViewModel(get(), get(), get(), get(), get(), get(), get()) }
     viewModel { FavouriteViewModel(get(), get(), get(), get(), get(), get(), get()) }
 }
