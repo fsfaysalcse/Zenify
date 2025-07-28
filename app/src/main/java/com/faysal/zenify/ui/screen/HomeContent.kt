@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ModalBottomSheetProperties
 import androidx.compose.material3.Scaffold
@@ -31,14 +30,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.util.UnstableApi
 import com.faysal.zenify.ui.components.MiniPlayer
 import com.faysal.zenify.ui.components.ModernCustomTabBar
 import com.faysal.zenify.ui.components.ModernSearchBar
 import com.faysal.zenify.ui.components.MusicPlayerHomeBackground
-import com.faysal.zenify.ui.mock.rememberFakeMusicViewModel
 import com.faysal.zenify.ui.states.MusicScreen
 import com.faysal.zenify.ui.viewModels.MusicViewModel
 import kotlinx.coroutines.launch
@@ -87,10 +84,11 @@ fun HomeContent(
         }
     }
 
-    MusicPlayerHomeBackground() {
-        Scaffold(
+
+    Scaffold(
             snackbarHost = { SnackbarHost(snackbarHostState) }
         ) { innerPadding ->
+        MusicPlayerHomeBackground() {
             Box(modifier = Modifier.fillMaxSize()) {
                 Column(
                     modifier = Modifier

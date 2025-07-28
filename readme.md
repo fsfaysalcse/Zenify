@@ -1,56 +1,97 @@
 # Zenify
 
-Zenify is a modern Android music player app built with Kotlin, Jetpack Compose, and Android's latest architecture components. It features audio playback, playlist management, favorites, and queue controls, all with persistent state and a clean, reactive UI.
+![image info](./cover.png)
 
-## Features
+Zenify is a modern Android **music player** built with **Kotlin**, **Jetpack Compose**, and Android's latest **architecture components**. It delivers a clean, reactive, and persistent playback experience — from browsing local audio to managing playlists, favorites, and queues.
 
-- Browse and play local audio files
-- Manage playlists and playback queue
-- Mark tracks as favorites
-- Persistent playback state (remembers last played track and state)
-- Mini player with play/pause, next, previous, shuffle, and repeat controls
-- Error handling with user feedback
-- Built using Jetpack Compose for a modern UI
+---
 
-## Tech Stack
+## ✨ Features
+
+- **Local Audio Playback** – Browse and play songs stored on the device
+- **Playlist Management** – Create, edit, and manage multiple playlists
+- **Favorites** – Quickly mark and access favorite tracks
+- **Queue Controls** – Add/remove songs and reorder the playback queue
+- **Persistent State** – Remembers last played track and playback position
+- **Mini Player** – With play/pause, next, previous, shuffle, and repeat controls
+- **Error Handling** – Clear user feedback for playback errors
+- **Modern UI** – Fully built using Jetpack Compose with smooth animations
+
+---
+
+## 🛠 Tech Stack
 
 - **Kotlin**
 - **Jetpack Compose**
 - **Android Architecture Components** (ViewModel, StateFlow, SavedStateHandle)
-- **Media3** for audio playback
-- **DataStore** for persistent state
-- **Koin** for dependency injection
-- **Coroutines** for async operations
+- **Media3** (modern Android audio playback library)
+- **DataStore** (persistent state management)
+- **Koin** (dependency injection)
+- **Coroutines** (asynchronous programming)
 
-## Project Structure
+---
 
-- `app/src/main/java/com/faysal/zenify/ui/viewModels/` — ViewModels for UI state and logic
-- `app/src/main/java/com/faysal/zenify/data/datastore/` — DataStore managers for playback and playlist state
-- `app/src/main/java/com/faysal/zenify/data/service/` — Music service connection
-- `app/src/main/java/com/faysal/zenify/domain/` — Use cases and repositories
-- `app/src/main/java/com/faysal/zenify/ui/` — UI components and screens
+## 📂 Project Structure
 
-## Getting Started
+```
+app/
+ └── src/main/java/com/faysal/zenify/
+     ├── ui/                # UI screens and composables
+     │    └── viewModels/   # ViewModels for state management
+     ├── data/
+     │    ├── datastore/    # DataStore managers
+     │    └── service/      # Music service and connections
+     └── domain/            # Use cases and repositories
+```
 
-1. **Clone the repository:**
+---
 
-2. **Open in Android Studio**  
-   Open the project folder in Android Studio (2023.1.1 or newer recommended).
+## 🚀 Getting Started
 
-3. **Build the project**  
-   Let Gradle sync and build the project.
+### 1. Clone the Repository
+```bash
+git clone https://github.com/<your-username>/Zenify.git
+```
 
-4. **Run the app**  
-   Connect an Android device or use an emulator, then click Run.
+### 2. Open in Android Studio
+Open the project in **Android Studio 2023.1.1** (or newer).
 
-## Dependency Injection
+### 3. Build the Project
+Allow Gradle to sync and build dependencies.
 
-Zenify uses Koin for DI. All core dependencies (ViewModels, DataStore, ServiceConnection) are provided in `AppModule.kt`.  
-Make sure to add the following to your Koin module if not present:
+### 4. Run the App
+Connect an Android device or launch an emulator, then click **Run**.
+
+---
+
+## 🧩 Dependency Injection
+
+Zenify uses **Koin** for dependency injection. Ensure you have the following module setup:
 
 ```kotlin
 single { com.faysal.zenify.data.datastore.PlaylistDataStore(androidContext()) }
 ```
 
-## Contributing
-Contributions are welcome! If you find a bug or have a feature request, please open an issue or submit a pull request.
+Other core dependencies (ViewModels, DataStore, Service Connection) are provided in `AppModule.kt`.
+
+---
+
+## 🤝 Contributing
+
+Contributions are **welcome and encouraged!**  
+Here’s how you can help:
+
+- **Report Bugs** – Open an [issue](../../issues) describing the problem.
+- **Suggest Features** – Share ideas to improve Zenify.
+- **Submit Pull Requests** – Fork the repo, make your changes, and open a PR.
+
+Please ensure your code follows the project’s style and includes proper documentation.
+
+---
+
+## 📸 Screenshots
+
+_(Add screenshots or previews of your app UI here for better presentation)_
+
+---
+

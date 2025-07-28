@@ -32,7 +32,7 @@ fun ModernSearchBar(
     onNavigationClick: () -> Unit = {},
     onSearchTextChange: (String) -> Unit = {},
     placeholder: String = "Search...",
-    backgroundColor: Color = MaterialTheme.colorScheme.onSurface,
+    backgroundColor: Color = MaterialTheme.colorScheme.surfaceVariant,
     contentColor: Color = Color.Black,
     elevation: Int = 4
 ) {
@@ -80,7 +80,7 @@ fun ModernSearchBar(
                         Icon(
                             painter = painterResource(icon),
                             contentDescription = "Navigation",
-                            tint = contentColor.copy(alpha = 0.8f),
+                            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
                             modifier = Modifier.size(24.dp)
                         )
                     }
@@ -116,7 +116,7 @@ fun ModernSearchBar(
                                 text = placeholder,
                                 fontFamily = AvenirNext,
                                 fontSize = 16.sp,
-                                color = contentColor.copy(alpha = 0.5f),
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                                 fontWeight = FontWeight.Normal
                             )
                         }
@@ -131,7 +131,7 @@ fun ModernSearchBar(
             Icon(
                 painter = painterResource(id = R.drawable.ic_search),
                 contentDescription = "Search",
-                tint = contentColor.copy(alpha = 0.7f),
+                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                 modifier = Modifier.size(24.dp)
             )
         }
